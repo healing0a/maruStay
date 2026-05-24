@@ -163,7 +163,7 @@ body {
       rgba(30,14,3,.80) 38%,
       rgba(55,24,5,.44) 62%,
       rgba(70,30,5,.10) 100%),
-    url('images/maru.jpg') 68% center / cover no-repeat;
+    url('images/maru.jpg') 75% 22% / cover no-repeat;
   background-color: #1e0c04; /* 이미지 없을 때 폴백 */
   overflow: hidden;
   padding: var(--nav-h) 24px 80px;
