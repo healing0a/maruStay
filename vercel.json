@@ -1,10 +1,5 @@
 {
   "buildCommand": null,
   "outputDirectory": ".",
-  "framework": null,
-  "functions": {
-    "api/*.js": {
-      "runtime": "nodejs22.x"
-    }
-  }
+  "framework": null
 }
