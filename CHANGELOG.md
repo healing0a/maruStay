@@ -1,5 +1,14 @@
 # MaruStay Changelog
 
+## v0.2.0 — 어드민 + AI 알림장
+
+### 추가된 기능
+- 어드민 페이지 (admin.html) — Supabase Auth 로그인, 예약 목록/상세, 상태 변경, 메모
+- AI 알림장 (api/generate-report.js) — OpenAI GPT-4o-mini, 일일 기록 입력 → 알림장 자동 생성
+- ai_reports 테이블 (Supabase) — 알림장 히스토리 저장
+
+---
+
 ## v0.1.0 — MVP 홈페이지 초기 릴리즈
 
 ### 추가된 기능
