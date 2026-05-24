@@ -9,17 +9,43 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // =====================================================
-// 예약 신청 저장
+// 예약 신청 저장 (SECURITY DEFINER RPC 함수 사용)
 // =====================================================
 async function submitReservation(formData) {
-  const { data, error } = await db
-    .from('reservation_requests')
-    .insert([formData])
-    .select('id')
-    .single();
+  const { data, error } = await db.rpc('submit_reservation_request', {
+    p_owner_name:        formData.owner_name,
+    p_owner_phone:       formData.owner_phone,
+    p_owner_email:       formData.owner_email,
+    p_owner_address:     formData.owner_address,
+    p_owner_emergency:   formData.owner_emergency,
+    p_pet_name:          formData.pet_name,
+    p_pet_type:          formData.pet_type,
+    p_pet_breed:         formData.pet_breed,
+    p_pet_age:           formData.pet_age,
+    p_pet_gender:        formData.pet_gender,
+    p_pet_neutered:      formData.pet_neutered,
+    p_pet_weight:        formData.pet_weight,
+    p_pet_reg_no:        formData.pet_reg_no,
+    p_pet_vaccinated:    formData.pet_vaccinated,
+    p_pet_bite:          formData.pet_bite,
+    p_pet_anxiety:       formData.pet_anxiety,
+    p_pet_allergy:       formData.pet_allergy,
+    p_pet_medications:   formData.pet_medications,
+    p_pet_notes:         formData.pet_notes,
+    p_checkin_date:      formData.checkin_date,
+    p_checkout_date:     formData.checkout_date,
+    p_room_type:         formData.room_type,
+    p_pickup_service:    formData.pickup_service,
+    p_hiorder_requested: formData.hiorder_requested,
+    p_requests:          formData.requests,
+    p_consent_privacy:   formData.consent_privacy,
+    p_consent_cctv:      formData.consent_cctv,
+    p_consent_ai:        formData.consent_ai,
+    p_consent_marketing: formData.consent_marketing,
+  });
 
   if (error) throw error;
-  return data;
+  return { id: data };
 }
 
 // =====================================================
