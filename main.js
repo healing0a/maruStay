@@ -39,6 +39,20 @@ ci.min = today;
 co.min = today;
 ci.addEventListener('change', () => { co.min = ci.value; if (co.value && co.value < ci.value) co.value = ci.value; });
 
+// 전체 동의 체크박스
+const consentAll      = document.getElementById('consentAll');
+const consentBoxes    = document.querySelectorAll('.consent-required, #consentAi, #consentMarketing');
+const requiredBoxes   = document.querySelectorAll('.consent-required');
+
+consentAll.addEventListener('change', () => {
+  consentBoxes.forEach(cb => { cb.checked = consentAll.checked; });
+});
+consentBoxes.forEach(cb => {
+  cb.addEventListener('change', () => {
+    consentAll.checked = [...consentBoxes].every(c => c.checked);
+  });
+});
+
 // Booking form
 document.getElementById('bookingForm').addEventListener('submit', (e) => {
   e.preventDefault();

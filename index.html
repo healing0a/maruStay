@@ -690,10 +690,43 @@
         </div>
 
         <div class="form__consent">
-          <label class="checkbox">
-            <input type="checkbox" id="consent" required />
-            <span>CCTV 촬영 및 서비스 개선 목적의 데이터 활용에 동의합니다. <a href="#">개인정보 처리방침</a></span>
-          </label>
+          <div class="consent__all">
+            <label class="checkbox checkbox--all">
+              <input type="checkbox" id="consentAll" />
+              <span><strong>전체 동의</strong></span>
+            </label>
+          </div>
+          <div class="consent__list">
+            <label class="checkbox">
+              <input type="checkbox" id="consentPrivacy" class="consent-required" required />
+              <span>
+                <strong>[필수]</strong> 개인정보 수집·이용 동의
+                <br><small>보호자 및 반려동물 정보를 예약·케어·리포트 제공 목적으로 수집합니다.</small>
+                <a href="privacy.html" target="_blank">전문 보기</a>
+              </span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="consentCctv" class="consent-required" required />
+              <span>
+                <strong>[필수]</strong> CCTV 촬영 동의
+                <br><small>반려동물 안전 모니터링을 위해 입실 기간 중 CCTV를 운영합니다. 보호자 전용 링크로만 제공되며 퇴실 후 자동 만료됩니다.</small>
+              </span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="consentAi" />
+              <span>
+                <strong>[선택]</strong> 반려동물 활동 데이터 AI 학습 활용 동의
+                <br><small>식사·배변·수면·행동 데이터를 반려동물의 안전과 편안함을 위한 AI 케어 품질 개선 학습 자료로 활용합니다. 개인 식별이 불가한 형태로 익명화하여 사용하며, 광고·홍보·외부 제공에는 절대 사용하지 않습니다. 동의하지 않아도 서비스 이용에 불이익이 없습니다.</small>
+              </span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="consentMarketing" />
+              <span>
+                <strong>[선택]</strong> 마케팅 정보 수신 동의
+                <br><small>할인 이벤트, 신규 서비스 등 유용한 정보를 카카오톡·문자로 받아보실 수 있습니다.</small>
+              </span>
+            </label>
+          </div>
         </div>
 
         <div class="form__submit">
@@ -816,7 +849,7 @@
         </div>
       </div>
       <div class="footer__bottom">
-        <p>© 2025 MaruStay. All rights reserved.</p>
+        <p>© 2025 MaruStay. All rights reserved. &nbsp;|&nbsp; <a href="privacy.html" style="color:rgba(255,255,255,.45);text-decoration:underline;">개인정보 처리방침</a></p>
         <p>사업자등록번호: 000-00-00000 | 대표: 000 | 주소: 주소를 입력해주세요</p>
       </div>
     </div>
