@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>MaruStay Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brown-dk: #4a3728;
+      --brown:    #6b4e37;
+      --accent:   #d4956a;
+      --cream:    #fdf6ee;
+      --sand:     #e8d5bc;
+      --bg:       #f0ece6;
+      --radius:   12px;
+      --shadow:   0 2px 14px rgba(0,0,0,.08);
+      --pending:  #f39c12;
+      --confirmed:#3498db;
+      --checkin:  #27ae60;
+      --checkout: #8e44ad;
+      --cancelled:#e74c3c;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: #333; min-height: 100vh; }
+
+    /* ══════════════════════════════════════════
+       LOGIN SCREEN
+    ══════════════════════════════════════════ */
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, var(--brown-dk) 0%, var(--brown) 100%);
+    }
+
+    .login-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.25);
+    }
+
+    .login-logo { text-align: center; margin-bottom: 36px; }
+    .login-logo .paw { font-size: 52px; display: block; margin-bottom: 10px; }
+    .login-logo h1 { font-size: 22px; font-weight: 700; color: var(--brown-dk); }
+    .login-logo p  { font-size: 12px; color: #aaa; margin-top: 4px; letter-spacing: .04em; }
+
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 12px; font-weight: 700; color: #777; margin-bottom: 6px; letter-spacing: .03em; }
+    .field input {
+      width: 100%; padding: 12px 16px;
+      border: 1.5px solid #e4dcd4; border-radius: 10px;
+      font-size: 15px; font-family: inherit; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,149,106,.15); }
+
+    .login-btn {
+      width: 100%; padding: 14px;
+      background: var(--brown-dk); color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 700; font-family: inherit;
+      cursor: pointer; margin-top: 8px; transition: background .2s, transform .1s;
+    }
+    .login-btn:hover:not(:disabled) { background: var(--brown); }
+    .login-btn:active:not(:disabled) { transform: scale(.99); }
+    .login-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    .login-err {
+      margin-top: 12px; padding: 10px 14px;
+      background: #fef0ef; border-radius: 8px;
+      color: var(--cancelled); font-size: 13px; text-align: center; display: none;
+    }
+
+    /* ══════════════════════════════════════════
+       DASHBOARD
+    ══════════════════════════════════════════ */
+    .dashboard { display: none; }
+
+    /* Top Bar */
+    .topbar {
+      background: var(--brown-dk); color: #fff;
+      height: 56px; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,.2);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .topbar-brand { font-size: 16px; font-weight: 700; }
+    .topbar-badge {
+      background: rgba(255,255,255,.15); padding: 3px 10px;
+      border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .04em;
+    }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-email { font-size: 12px; opacity: .7; }
+    .logout-btn {
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+      color: #fff; padding: 6px 14px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background .2s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,.22); }
+
+    /* Main */
+    .main { max-width: 1240px; margin: 0 auto; padding: 24px 20px; }
+
+    /* Stats */
+    .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+
+    .stat-card {
+      background: #fff; border-radius: var(--radius);
+      padding: 18px 20px; box-shadow: var(--shadow);
+    }
+    .stat-card .s-label { font-size: 11px; font-weight: 600; color: #aaa; letter-spacing: .04em; margin-bottom: 8px; }
+    .stat-card .s-num   { font-size: 32px; font-weight: 700; color: #222; line-height: 1; }
+    .stat-card .s-unit  { font-size: 13px; font-weight: 400; color: #aaa; margin-left: 2px; }
+    .stat-card.s-pending   .s-num { color: var(--pending); }
+    .stat-card.s-confirmed .s-num { color: var(--confirmed); }
+    .stat-card.s-checkin   .s-num { color: var(--checkin); }
+    .stat-card.s-cancelled .s-num { color: var(--cancelled); }
+
+    /* Filter Bar */
+    .filter-bar {
+      background: #fff; border-radius: var(--radius);
+      padding: 14px 18px; box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    }
+    .filter-bar input, .filter-bar select {
+      padding: 8px 12px; border: 1.5px solid #e4dcd4; border-radius: 8px;
+      font-size: 13px; font-family: inherit; outline: none; background: #fff;
+      transition: border-color .2s;
+    }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); }
+    #searchInput { flex: 1; min-width: 200px; }
+    .refresh-btn {
+      margin-left: auto; background: var(--cream); border: 1.5px solid var(--sand);
+      color: var(--brown); padding: 8px 16px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background .2s;
+      white-space: nowrap;
+    }
+    .refresh-btn:hover { background: var(--sand); }
+
+    /* Table Wrap */
+    .table-wrap { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+
+    .table-head-row {
+      padding: 16px 20px; border-bottom: 1px solid #f3ede6;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .table-head-row h2 { font-size: 14px; font-weight: 700; color: #333; }
+    .table-count { font-size: 12px; color: #aaa; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 10px 16px; text-align: left;
+      font-size: 11px; font-weight: 700; color: #aaa; letter-spacing: .05em;
+      background: #faf8f5; border-bottom: 1px solid #f3ede6;
+    }
+    tbody tr { border-bottom: 1px solid #f9f7f4; cursor: pointer; transition: background .12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fdf8f3; }
+    td { padding: 13px 16px; font-size: 13px; color: #555; vertical-align: middle; }
+    td .pri { font-weight: 600; color: #222; font-size: 14px; }
+    td .sec { color: #aaa; font-size: 12px; margin-top: 2px; }
+
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; white-space: nowrap;
+    }
+    .badge.pending    { background: #fff8e1; color: #b08000; }
+    .badge.confirmed  { background: #e3f2fd; color: #0d6fa3; }
+    .badge.checked_in { background: #e8f5e9; color: #1e7d2e; }
+    .badge.checked_out{ background: #f3f0f7; color: #6c3a9b; }
+    .badge.cancelled  { background: #fdecea; color: #c0392b; }
+
+    .empty { padding: 64px 20px; text-align: center; }
+    .empty .ei { font-size: 44px; margin-bottom: 12px; }
+    .empty p   { color: #bbb; font-size: 14px; }
+
+    /* ══════════════════════════════════════════
+       DETAIL MODAL
+    ══════════════════════════════════════════ */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 200;
+      display: none; justify-content: center; align-items: flex-start;
+      padding: 32px 16px; overflow-y: auto;
+    }
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: #fff; border-radius: 20px;
+      width: 100%; max-width: 700px; overflow: hidden;
+      animation: popUp .2s ease;
+      margin: auto;
+    }
+    @keyframes popUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-top {
+      background: var(--brown-dk); color: #fff;
+      padding: 20px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-top h3 { font-size: 17px; font-weight: 700; }
+    .modal-top .mid { font-size: 11px; opacity: .55; margin-top: 3px; font-family: monospace; }
+    .modal-x {
+      background: rgba(255,255,255,.15); border: none; color: #fff;
+      width: 34px; height: 34px; border-radius: 8px;
+      font-size: 18px; cursor: pointer; transition: background .2s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .modal-x:hover { background: rgba(255,255,255,.28); }
+
+    .modal-body { padding: 24px; }
+
+    .msec { margin-bottom: 24px; }
+    .msec h4 {
+      font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+      color: #bbb; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0ece6;
+    }
+    .igrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .iitem .il { font-size: 11px; font-weight: 600; color: #bbb; margin-bottom: 3px; }
+    .iitem .iv { font-size: 14px; color: #333; font-weight: 500; }
+    .iitem.full { grid-column: 1 / -1; }
+    .iitem a { color: var(--accent); text-decoration: none; }
+    .iitem a:hover { text-decoration: underline; }
+
+    .consent-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .ctag {
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    }
+    .ctag.yes { background: #e8f5e9; color: #2d7d2d; }
+    .ctag.no  { background: #f5f5f5; color: #aaa; }
+
+    .modal-actions {
+      padding: 16px 24px;
+      border-top: 1px solid #f0ece6;
+      background: #faf8f5;
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    }
+    .act-label { font-size: 11px; font-weight: 700; color: #bbb; letter-spacing: .04em; margin-right: 4px; }
+    .abtn {
+      padding: 9px 18px; border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: opacity .15s, transform .1s;
+    }
+    .abtn:hover:not(:disabled) { opacity: .85; }
+    .abtn:active { transform: scale(.97); }
+    .abtn:disabled { opacity: .35; cursor: not-allowed; }
+    .abtn.confirm  { background: var(--confirmed); color: #fff; }
+    .abtn.checkin  { background: var(--checkin);   color: #fff; }
+    .abtn.checkout { background: var(--checkout);  color: #fff; }
+    .abtn.cancel   { background: var(--cancelled); color: #fff; }
+
+    .memo-wrap { margin-top: 0; }
+    .memo-wrap textarea {
+      width: 100%; padding: 10px 12px;
+      border: 1.5px solid #e4dcd4; border-radius: 8px;
+      font-size: 13px; font-family: inherit;
+      resize: vertical; min-height: 72px; outline: none;
+      transition: border-color .2s;
+    }
+    .memo-wrap textarea:focus { border-color: var(--accent); }
+    .save-memo {
+      margin-top: 8px; padding: 8px 18px;
+      background: var(--brown-dk); color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: background .2s;
+    }
+    .save-memo:hover { background: var(--brown); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: #222; color: #fff; padding: 12px 24px;
+      border-radius: 40px; font-size: 13px; font-weight: 600;
+      box-shadow: 0 8px 32px rgba(0,0,0,.2); z-index: 9999;
+      animation: fadeUp .3s ease;
+      display: none;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translate(-50%, 10px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .topbar-email { display: none; }
+      thead { display: none; }
+      tbody tr { display: block; padding: 14px 16px; }
+      td { display: block; padding: 2px 0; border: none; }
+      td[data-label]::before {
+        content: attr(data-label) " ";
+        font-size: 11px; font-weight: 700; color: #bbb;
+      }
+      .igrid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════════ -->
+<div class="login-wrap" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="paw">🐾</span>
+      <h1>MaruStay Admin</h1>
+      <p>관리자 전용 · 무단 접근 금지</p>
+    </div>
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="adminEmail">이메일</label>
+        <input type="email" id="adminEmail" placeholder="admin@marustay.kr" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="adminPw">비밀번호</label>
+        <input type="password" id="adminPw" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="login-btn" id="loginBtn">로그인</button>
+      <div class="login-err" id="loginErr"></div>
+    </form>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     DASHBOARD
+══════════════════════════════════════════ -->
+<div class="dashboard" id="dashboard">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-brand">🐾 MaruStay</span>
+      <span class="topbar-badge">ADMIN</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-email" id="topbarEmail"></span>
+      <button class="logout-btn" id="logoutBtn">로그아웃</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="s-label">📋 전체 예약</div>
+        <div><span class="s-num" id="sTotal">—</span><span class="s-unit">건</span></div>
+      </div>
+      <div class="stat-card s-pending">
+        <div class="s-label">⏳ 대기중</div>
+        <div><span class="s-num" id="sPending">—</span><span class="s-unit">건</span></div>
+      </div>
+      <div class="stat-card s-confirmed">
+        <div class="s-label">✅ 예약 확정</div>
+        <div><span class="s-num" id="sConfirmed">—</span><span class="s-unit">건</span></div>
+      </div>
+      <div class="stat-card s-checkin">
+        <div class="s-label">🏠 입실 중</div>
+        <div><span class="s-num" id="sCheckin">—</span><span class="s-unit">건</span></div>
+      </div>
+      <div class="stat-card s-cancelled">
+        <div class="s-label">❌ 취소</div>
+        <div><span class="s-num" id="sCancelled">—</span><span class="s-unit">건</span></div>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <input type="text" id="searchInput" placeholder="🔍  보호자명 · 연락처 · 반려동물명 검색">
+      <select id="statusFilter">
+        <option value="">전체 상태</option>
+        <option value="pending">⏳ 대기중</option>
+        <option value="confirmed">✅ 예약 확정</option>
+        <option value="checked_in">🏠 입실 중</option>
+        <option value="checked_out">✓ 퇴실 완료</option>
+        <option value="cancelled">❌ 취소</option>
+      </select>
+      <input type="date" id="dateFilter" title="체크인 날짜 필터">
+      <button class="refresh-btn" id="refreshBtn">↻ 새로고침</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div class="table-head-row">
+        <h2>예약 목록</h2>
+        <span class="table-count" id="tableCount">불러오는 중...</span>
+      </div>
+      <div id="tableBody">
+        <div class="empty"><div class="ei">📋</div><p>불러오는 중...</p></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     DETAIL MODAL
+══════════════════════════════════════════ -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-top">
+      <div>
+        <h3 id="modalTitle">예약 상세</h3>
+        <div class="mid" id="modalId"></div>
+      </div>
+      <button class="modal-x" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── Supabase 초기화 ──
+const { createClient } = supabase;
+const db = createClient(
+  'https://sjzxpqtkpaehazwtonge.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqenhwcXRrcGFlaGF6d3RvbmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTYwMTMsImV4cCI6MjA5NTE5MjAxM30.M8CqLiIQeOSfoWh-rpQ-lkrnUEWhU9pS7v72vUZfxIs'
+);
+
+// ── 상수 ──
+const STATUS_LABEL = {
+  pending:     '대기중',
+  confirmed:   '예약확정',
+  checked_in:  '입실중',
+  checked_out: '퇴실완료',
+  cancelled:   '취소',
+};
+
+const STATUS_NEXT = {
+  pending:    [{ label: '✅ 예약 확정', cls: 'confirm',  next: 'confirmed'  }],
+  confirmed:  [{ label: '🏠 입실 처리', cls: 'checkin',  next: 'checked_in' }],
+  checked_in: [{ label: '✓ 퇴실 완료',  cls: 'checkout', next: 'checked_out'}],
+  checked_out: [],
+  cancelled:   [],
+};
+
+// ── 상태 ──
+let allData = [];
+let currentId = null;
+
+
+/* ════════════════════════════════════════════
+   AUTH
+════════════════════════════════════════════ */
+async function init() {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) {
+    enterDashboard(session.user.email);
+    loadData();
+  }
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginErr');
+  err.style.display = 'none';
+  btn.textContent = '로그인 중...';
+  btn.disabled = true;
+
+  const { data, error } = await db.auth.signInWithPassword({
+    email:    document.getElementById('adminEmail').value,
+    password: document.getElementById('adminPw').value,
+  });
+
+  if (error) {
+    err.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
+    err.style.display = 'block';
+    btn.textContent = '로그인';
+    btn.disabled = false;
+    return;
+  }
+  enterDashboard(data.user.email);
+  loadData();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await db.auth.signOut();
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  allData = [];
+});
+
+function enterDashboard(email) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('topbarEmail').textContent = email;
+}
+
+
+/* ════════════════════════════════════════════
+   DATA
+════════════════════════════════════════════ */
+async function loadData() {
+  const { data, error } = await db
+    .from('reservation_requests')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    document.getElementById('tableBody').innerHTML =
+      `<div class="empty"><div class="ei">⚠️</div><p>불러오기 실패: ${error.message}</p></div>`;
+    return;
+  }
+  allData = data || [];
+  renderStats();
+  renderTable();
+}
+
+document.getElementById('refreshBtn').addEventListener('click', loadData);
+['searchInput','statusFilter','dateFilter'].forEach(id =>
+  document.getElementById(id).addEventListener('input', renderTable)
+);
+
+
+/* ════════════════════════════════════════════
+   STATS
+════════════════════════════════════════════ */
+function renderStats() {
+  const c = { pending:0, confirmed:0, checked_in:0, cancelled:0 };
+  allData.forEach(r => { if (c[r.status] !== undefined) c[r.status]++; });
+  document.getElementById('sTotal').textContent     = allData.length;
+  document.getElementById('sPending').textContent   = c.pending;
+  document.getElementById('sConfirmed').textContent = c.confirmed;
+  document.getElementById('sCheckin').textContent   = c.checked_in;
+  document.getElementById('sCancelled').textContent = c.cancelled;
+}
+
+
+/* ════════════════════════════════════════════
+   TABLE
+════════════════════════════════════════════ */
+function getFiltered() {
+  const q  = document.getElementById('searchInput').value.toLowerCase();
+  const st = document.getElementById('statusFilter').value;
+  const dt = document.getElementById('dateFilter').value;
+  return allData.filter(r =>
+    (!q  || r.owner_name?.toLowerCase().includes(q)
+          || r.owner_phone?.includes(q)
+          || r.pet_name?.toLowerCase().includes(q)) &&
+    (!st || r.status === st) &&
+    (!dt || r.checkin_date === dt)
+  );
+}
+
+function renderTable() {
+  const rows = getFiltered();
+  document.getElementById('tableCount').textContent = `${rows.length}건`;
+
+  if (!rows.length) {
+    document.getElementById('tableBody').innerHTML =
+      `<div class="empty"><div class="ei">🔍</div><p>조건에 맞는 예약이 없습니다.</p></div>`;
+    return;
+  }
+
+  const trs = rows.map(r => `
+    <tr onclick="openModal('${r.id}')">
+      <td data-label="접수">
+        <div class="pri">${fmtDate(r.created_at)}</div>
+        <div class="sec">${fmtTime(r.created_at)}</div>
+      </td>
+      <td data-label="보호자">
+        <div class="pri">${esc(r.owner_name)}</div>
+        <div class="sec">${esc(r.owner_phone)}</div>
+      </td>
+      <td data-label="반려동물">
+        <div class="pri">${esc(r.pet_name)}</div>
+        <div class="sec">${esc(r.pet_type)}${r.pet_breed ? ' · ' + esc(r.pet_breed) : ''}</div>
+      </td>
+      <td data-label="체크인">
+        <div class="pri">${r.checkin_date || '-'}</div>
+        <div class="sec">~ ${r.checkout_date || '-'}</div>
+      </td>
+      <td data-label="객실">${esc(r.room_type) || '-'}</td>
+      <td data-label="상태"><span class="badge ${r.status}">${STATUS_LABEL[r.status] || r.status}</span></td>
+    </tr>`).join('');
+
+  document.getElementById('tableBody').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>접수일시</th>
+          <th>보호자</th>
+          <th>반려동물</th>
+          <th>체크인 / 아웃</th>
+          <th>객실</th>
+          <th>상태</th>
+        </tr>
+      </thead>
+      <tbody>${trs}</tbody>
+    </table>`;
+}
+
+
+/* ════════════════════════════════════════════
+   MODAL
+════════════════════════════════════════════ */
+function openModal(id) {
+  currentId = id;
+  const r = allData.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('modalTitle').textContent = `${r.pet_name}  (${r.owner_name})`;
+  document.getElementById('modalId').textContent    = `예약 ID: ${r.id}`;
+  renderModalBody(r);
+  renderModalActions(r);
+  document.getElementById('overlay').classList.add('open');
+}
+
+function renderModalBody(r) {
+  const ctag = (v, label) => `<span class="ctag ${v ? 'yes' : 'no'}">${v ? '✓' : '✕'} ${label}</span>`;
+
+  document.getElementById('modalBody').innerHTML = `
+    <!-- 보호자 -->
+    <div class="msec">
+      <h4>보호자 정보</h4>
+      <div class="igrid">
+        <div class="iitem"><div class="il">이름</div><div class="iv">${esc(r.owner_name)}</div></div>
+        <div class="iitem"><div class="il">연락처</div><div class="iv"><a href="tel:${esc(r.owner_phone)}">${esc(r.owner_phone)}</a></div></div>
+        <div class="iitem"><div class="il">이메일</div><div class="iv">${esc(r.owner_email) || '—'}</div></div>
+        <div class="iitem"><div class="il">비상연락처</div><div class="iv">${esc(r.owner_emergency) || '—'}</div></div>
+        <div class="iitem full"><div class="il">주소</div><div class="iv">${esc(r.owner_address) || '—'}</div></div>
+      </div>
+    </div>
+
+    <!-- 반려동물 -->
+    <div class="msec">
+      <h4>반려동물 정보</h4>
+      <div class="igrid">
+        <div class="iitem"><div class="il">이름</div><div class="iv">${esc(r.pet_name)}</div></div>
+        <div class="iitem"><div class="il">종류</div><div class="iv">${esc(r.pet_type)}</div></div>
+        <div class="iitem"><div class="il">품종</div><div class="iv">${esc(r.pet_breed) || '—'}</div></div>
+        <div class="iitem"><div class="il">나이</div><div class="iv">${esc(r.pet_age) || '—'}</div></div>
+        <div class="iitem"><div class="il">성별</div><div class="iv">${esc(r.pet_gender) || '—'}</div></div>
+        <div class="iitem"><div class="il">중성화</div><div class="iv">${esc(r.pet_neutered) || '—'}</div></div>
+        <div class="iitem"><div class="il">체중</div><div class="iv">${r.pet_weight ? esc(r.pet_weight) + ' kg' : '—'}</div></div>
+        <div class="iitem"><div class="il">등록번호</div><div class="iv">${esc(r.pet_reg_no) || '—'}</div></div>
+        <div class="iitem"><div class="il">백신 여부</div><div class="iv">${esc(r.pet_vaccinated) || '—'}</div></div>
+        <div class="iitem"><div class="il">공격성</div><div class="iv">${esc(r.pet_bite) || '—'}</div></div>
+        <div class="iitem"><div class="il">분리불안</div><div class="iv">${esc(r.pet_anxiety) || '—'}</div></div>
+        <div class="iitem"><div class="il">알레르기</div><div class="iv">${esc(r.pet_allergy) || '—'}</div></div>
+        <div class="iitem full"><div class="il">복용약 / 질환</div><div class="iv">${esc(r.pet_medications) || '—'}</div></div>
+        <div class="iitem full"><div class="il">특이사항</div><div class="iv">${esc(r.pet_notes) || '—'}</div></div>
+      </div>
+    </div>
+
+    <!-- 이용 정보 -->
+    <div class="msec">
+      <h4>이용 정보</h4>
+      <div class="igrid">
+        <div class="iitem"><div class="il">체크인</div><div class="iv">${r.checkin_date || '—'}</div></div>
+        <div class="iitem"><div class="il">체크아웃</div><div class="iv">${r.checkout_date || '—'}</div></div>
+        <div class="iitem"><div class="il">객실</div><div class="iv">${esc(r.room_type) || '—'}</div></div>
+        <div class="iitem"><div class="il">픽드롭</div><div class="iv">${esc(r.pickup_service) || 'basic'}</div></div>
+        <div class="iitem"><div class="il">하이오더</div><div class="iv">${r.hiorder_requested ? '신청' : '미신청'}</div></div>
+        <div class="iitem"><div class="il">현재 상태</div><div class="iv"><span class="badge ${r.status}">${STATUS_LABEL[r.status] || r.status}</span></div></div>
+        <div class="iitem full"><div class="il">요청사항</div><div class="iv">${esc(r.requests) || '—'}</div></div>
+      </div>
+    </div>
+
+    <!-- 동의 -->
+    <div class="msec">
+      <h4>동의 항목</h4>
+      <div class="consent-row">
+        ${ctag(r.consent_privacy,  '개인정보 수집·이용')}
+        ${ctag(r.consent_cctv,     'CCTV 촬영')}
+        ${ctag(r.consent_ai,       'AI 데이터 활용')}
+        ${ctag(r.consent_marketing,'마케팅 수신')}
+      </div>
+    </div>
+
+    <!-- 접수일 -->
+    <div class="msec">
+      <h4>접수 정보</h4>
+      <div class="igrid">
+        <div class="iitem"><div class="il">접수일시</div><div class="iv">${fmtDate(r.created_at)} ${fmtTime(r.created_at)}</div></div>
+      </div>
+    </div>
+
+    <!-- 관리자 메모 -->
+    <div class="msec memo-wrap">
+      <h4>관리자 메모</h4>
+      <textarea id="memoArea" placeholder="메모를 입력하세요...">${esc(r.admin_memo) || ''}</textarea>
+      <button class="save-memo" id="saveMemoBtn" onclick="saveMemo()">메모 저장</button>
+    </div>
+  `;
+}
+
+function renderModalActions(r) {
+  const nexts  = STATUS_NEXT[r.status] || [];
+  const canCancel = ['pending','confirmed','checked_in'].includes(r.status);
+
+  document.getElementById('modalActions').innerHTML = `
+    <span class="act-label">상태 변경</span>
+    ${nexts.map(a =>
+      `<button class="abtn ${a.cls}" onclick="updateStatus('${r.id}','${a.next}')">${a.label}</button>`
+    ).join('')}
+    ${canCancel
+      ? `<button class="abtn cancel" onclick="updateStatus('${r.id}','cancelled')">❌ 취소 처리</button>`
+      : ''}
+    ${!nexts.length && !canCancel
+      ? `<span style="color:#ccc;font-size:13px">더 이상 변경할 상태가 없습니다</span>`
+      : ''}
+  `;
+}
+
+// 닫기
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay')) closeModal();
+});
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  currentId = null;
+}
+
+
+/* ════════════════════════════════════════════
+   STATUS UPDATE
+════════════════════════════════════════════ */
+async function updateStatus(id, next) {
+  const { error } = await db
+    .from('reservation_requests')
+    .update({ status: next })
+    .eq('id', id);
+
+  if (error) { showToast('⚠ 상태 변경 실패: ' + error.message); return; }
+
+  const r = allData.find(x => x.id === id);
+  if (r) r.status = next;
+
+  renderStats();
+  renderTable();
+  if (currentId === id) {
+    renderModalBody(r);
+    renderModalActions(r);
+  }
+  showToast(`✓ 상태가 "${STATUS_LABEL[next]}"으로 변경되었습니다`);
+}
+
+
+/* ════════════════════════════════════════════
+   MEMO
+════════════════════════════════════════════ */
+async function saveMemo() {
+  const memo = document.getElementById('memoArea')?.value || '';
+  const { error } = await db
+    .from('reservation_requests')
+    .update({ admin_memo: memo })
+    .eq('id', currentId);
+
+  if (error) { showToast('⚠ 메모 저장 실패'); return; }
+
+  const r = allData.find(x => x.id === currentId);
+  if (r) r.admin_memo = memo;
+
+  const btn = document.getElementById('saveMemoBtn');
+  if (btn) { btn.textContent = '✓ 저장됨'; setTimeout(() => btn.textContent = '메모 저장', 2000); }
+  showToast('✓ 메모가 저장되었습니다');
+}
+
+
+/* ════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════ */
+function fmtDate(dt) {
+  if (!dt) return '—';
+  const d = new Date(dt);
+  return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`;
+}
+function fmtTime(dt) {
+  if (!dt) return '';
+  const d = new Date(dt);
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.display = 'none'; }, 2800);
+}
+
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+init();
+</script>
+</body>
+</html>
