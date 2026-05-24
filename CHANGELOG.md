@@ -42,6 +42,11 @@
 - RLS 정책 4개
 - 성능 인덱스 4개
 
+#### Supabase RPC 함수 (submit_reservation_request)
+- SECURITY DEFINER 함수로 anon 키에서 안전하게 예약 INSERT 처리
+- 필수값 및 필수 동의 항목 서버사이드 검증
+- supabase-client.js: 직접 INSERT → RPC 호출 방식으로 변경
+
 ### 배포
 - Vercel: https://maru-stay.vercel.app
 - GitHub: https://github.com/healing0a/maruStay
