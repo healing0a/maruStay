@@ -103,7 +103,40 @@ CREATE POLICY "update_service_role"
   USING (true) WITH CHECK (true);
 
 
--- 5. 예약 신청 RPC 함수 (SECURITY DEFINER — anon 키로 호출 가능)
+-- 6. AI 알림장 테이블
+CREATE TABLE IF NOT EXISTS ai_reports (
+  id              UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  reservation_id  UUID REFERENCES reservation_requests(id) ON DELETE CASCADE NOT NULL,
+  report_date     DATE NOT NULL DEFAULT CURRENT_DATE,
+
+  -- 일일 기록 입력값
+  meal_am         TEXT,           -- 아침 식사
+  meal_pm         TEXT,           -- 점심 식사
+  meal_evening    TEXT,           -- 저녁 식사
+  meal_notes      TEXT,           -- 식사 메모
+  bathroom_count  INTEGER DEFAULT 0,
+  activity_level  TEXT DEFAULT 'normal',  -- low / normal / high
+  mood            TEXT DEFAULT 'good',    -- great / good / neutral / tired / anxious
+  temp_celsius    NUMERIC(4,1),   -- 실내 온도
+  humidity_pct    INTEGER,        -- 실내 습도
+  staff_notes     TEXT,           -- 직원 특이사항
+
+  -- 생성된 리포트
+  report_content  TEXT,
+
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+
+  UNIQUE (reservation_id, report_date)
+);
+
+ALTER TABLE ai_reports ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "ai_reports_admin" ON ai_reports FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+CREATE INDEX IF NOT EXISTS idx_ai_reports_reservation ON ai_reports(reservation_id);
+CREATE INDEX IF NOT EXISTS idx_ai_reports_date        ON ai_reports(report_date DESC);
+
+
+-- 7. 예약 신청 RPC 함수 (SECURITY DEFINER — anon 키로 호출 가능)
 -- anon이 테이블에 직접 INSERT하는 대신 이 함수를 통해 저장
 CREATE OR REPLACE FUNCTION public.submit_reservation_request(
   p_owner_name        text,
