@@ -343,6 +343,19 @@
       font-family: inherit; cursor: pointer; transition: background .2s;
     }
     .new-rpt-btn:hover { background: var(--sand); }
+    .share-link-btn {
+      padding: 6px 14px;
+      background: #f0f8ff;
+      border: 1.5px solid #b8d8f0; border-radius: 8px;
+      font-size: 12px; font-weight: 700; color: #3a7bd5;
+      font-family: inherit; cursor: pointer; transition: background .2s;
+    }
+    .share-link-btn:hover { background: #ddeeff; }
+    .report-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .report-section-header h4 { margin-bottom: 0; }
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
@@ -767,7 +780,10 @@ function renderModalBody(r) {
 
     <!-- AI 알림장 -->
     <div class="msec" id="reportSection">
-      <h4>AI 알림장</h4>
+      <div class="report-section-header">
+        <h4>AI 알림장</h4>
+        <button class="share-link-btn" onclick="copyShareLink()">📤 공유 링크</button>
+      </div>
       <div id="reportList"><p style="color:#ccc;font-size:13px">불러오는 중...</p></div>
       <div style="margin-top:10px">
         <button class="new-rpt-btn" id="newRptBtn" onclick="toggleReportForm()">✏️ 새 알림장 작성</button>
@@ -1014,6 +1030,22 @@ async function generateReport() {
     showToast('⚠ ' + err.message);
     btn.textContent = '✨ AI 알림장 생성';
     btn.disabled    = false;
+  }
+}
+
+function copyShareLink() {
+  if (!currentId) return;
+  const url = `${location.origin}/report.html?rid=${currentId}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('📤 공유 링크가 복사됐어요!'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('📤 공유 링크가 복사됐어요!');
   }
 }
 
