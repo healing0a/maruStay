@@ -74,7 +74,14 @@
     </div>
     <div class="hero__mascot">
       <div class="mascot-card">
-        <div class="mascot-emoji">🐕</div>
+        <div class="mascot-photo-wrap">
+          <img
+            src="images/maru.jpg"
+            alt="마루"
+            class="mascot-photo"
+            onerror="this.closest('.mascot-photo-wrap').outerHTML='<div class=\'mascot-emoji\'>🐕</div>'"
+          >
+        </div>
         <p class="mascot-name">마루</p>
         <p class="mascot-status">🟢 편안히 휴식 중</p>
         <div class="mascot-sensors">

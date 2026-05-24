@@ -2,21 +2,23 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --cream:     #fdf8f3;
-  --sand:      #f0e8db;
-  --sand-dk:   #e2d4c2;
-  --brown:     #8b6e52;
-  --brown-dk:  #4a3728;
-  --brown-mid: #6b4c35;
-  --accent:    #d4956a;
-  --accent-lt: #f0c9a8;
-  --green:     #a0c878;
-  --text:      #3a2e27;
-  --text-mid:  #6b5c50;
-  --text-lt:   #a89282;
-  --white:     #ffffff;
-  --shadow:    0 4px 24px rgba(90,60,30,.10);
-  --shadow-md: 0 8px 40px rgba(90,60,30,.14);
+  /* ── 마루 팔레트 — 꿀빛 황금 털에서 추출 ── */
+  --cream:     #fff8ec;   /* 따뜻한 아이보리 */
+  --sand:      #f5e8d2;   /* 부드러운 샌드 */
+  --sand-dk:   #e8d0b0;   /* 짙은 샌드 */
+  --brown:     #a07040;   /* 마루 털 중간톤 */
+  --brown-dk:  #3d1e08;   /* 마루 눈코 — 깊은 웜브라운 */
+  --brown-mid: #7a4520;   /* 중간 웜브라운 */
+  --accent:    #c87c3a;   /* 마루 주요 털색 — 허니 */
+  --accent-lt: #f0b870;   /* 햇빛 받은 털끝 — 황금 */
+  --amber:     #e8a050;   /* 앰버 강조 */
+  --green:     #90c060;   /* 포인트 그린 */
+  --text:      #3a2010;   /* 본문 — 웜 차콜 */
+  --text-mid:  #7a5030;   /* 보조 텍스트 */
+  --text-lt:   #b08860;   /* 약한 텍스트 */
+  --white:     #fffdf8;   /* 따뜻한 화이트 */
+  --shadow:    0 4px 24px rgba(140,80,20,.10);
+  --shadow-md: 0 8px 40px rgba(140,80,20,.16);
   --radius:    16px;
   --radius-sm: 8px;
   --t:         .3s ease;
@@ -75,11 +77,11 @@ body {
   font-family: inherit;
 }
 .btn--primary {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--amber) 100%);
   color: #fff;
-  box-shadow: 0 4px 18px rgba(212,149,106,.4);
+  box-shadow: 0 4px 20px rgba(200,120,50,.45);
 }
-.btn--primary:hover { background: #c07a50; transform: translateY(-2px); }
+.btn--primary:hover { background: linear-gradient(135deg, #b06830 0%, var(--accent) 100%); transform: translateY(-2px); }
 .btn--ghost {
   background: transparent;
   color: rgba(255,255,255,.85);
@@ -154,29 +156,37 @@ body {
   position: relative;
   min-height: 100vh;
   display: flex; align-items: center;
-  background: linear-gradient(150deg, #2e1c11 0%, #5c3a22 45%, #8b5e3c 100%);
+  /* 마루 사진 + 웜 그라디언트 오버레이 */
+  background:
+    linear-gradient(110deg,
+      rgba(8,3,0,.92)  0%,
+      rgba(30,14,3,.80) 38%,
+      rgba(55,24,5,.44) 62%,
+      rgba(70,30,5,.10) 100%),
+    url('images/maru.jpg') 68% center / cover no-repeat;
+  background-color: #1e0c04; /* 이미지 없을 때 폴백 */
   overflow: hidden;
   padding: var(--nav-h) 24px 80px;
 }
 .hero__bg-shapes { position: absolute; inset: 0; pointer-events: none; }
 .hero__shape {
   position: absolute; border-radius: 50%;
-  filter: blur(80px); opacity: .18;
+  filter: blur(80px); opacity: .15;
 }
 .hero__shape--1 {
-  width: 600px; height: 600px;
-  background: var(--accent);
-  top: -100px; right: -100px;
+  width: 500px; height: 500px;
+  background: var(--amber);
+  top: -80px; right: 5%;
 }
 .hero__shape--2 {
-  width: 400px; height: 400px;
-  background: var(--green);
-  bottom: -80px; left: 10%;
+  width: 350px; height: 350px;
+  background: var(--accent-lt);
+  bottom: -60px; left: 5%;
 }
 .hero__shape--3 {
-  width: 300px; height: 300px;
-  background: #f5c6a0;
-  top: 40%; left: 30%;
+  width: 280px; height: 280px;
+  background: #f5c060;
+  top: 35%; left: 25%;
 }
 .hero__content {
   position: relative;
@@ -207,9 +217,10 @@ body {
   font-family: 'Playfair Display', serif;
   font-style: italic;
   font-size: clamp(15px, 2vw, 20px);
-  color: var(--accent-lt);
+  color: var(--amber);
   margin-bottom: 16px;
-  letter-spacing: .05em;
+  letter-spacing: .06em;
+  text-shadow: 0 2px 12px rgba(0,0,0,.4);
 }
 .hero__desc {
   color: rgba(255,255,255,.7);
@@ -237,14 +248,28 @@ body {
   animation: fadeUp .9s .3s ease both;
 }
 .mascot-card {
-  background: rgba(255,255,255,.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 24px;
-  padding: 32px 28px;
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 28px;
+  padding: 28px 24px 24px;
   text-align: center;
-  min-width: 220px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  min-width: 230px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06);
+}
+/* 마루 사진 원형 프레임 */
+.mascot-photo-wrap {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 14px;
+  border: 3px solid rgba(255,220,140,.45);
+  box-shadow: 0 0 0 6px rgba(200,130,60,.18), 0 6px 24px rgba(0,0,0,.4);
+}
+.mascot-photo {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
 }
 .mascot-emoji { font-size: 72px; margin-bottom: 12px; }
 .mascot-name {
@@ -286,7 +311,7 @@ body {
   border-radius: var(--radius) 0 0 var(--radius);
 }
 .compare__card--new {
-  background: linear-gradient(135deg, var(--brown-dk) 0%, var(--brown-mid) 100%);
+  background: linear-gradient(135deg, #3d1e08 0%, var(--brown-mid) 60%, var(--accent) 100%);
   border-radius: 0 var(--radius) var(--radius) 0;
 }
 .compare__vs {
@@ -422,7 +447,7 @@ body {
 
 /* ===== PICKUP ===== */
 .pickup__inner {
-  background: linear-gradient(135deg, var(--brown-dk) 0%, #7a5640 60%, #c07a50 100%);
+  background: linear-gradient(135deg, #3d1e08 0%, var(--brown-mid) 50%, var(--accent) 100%);
   padding: 88px 0;
 }
 .pickup__flow {
@@ -489,9 +514,9 @@ body {
 .credit__benefit p { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
 .credit__card-wrap { display: flex; flex-direction: column; gap: 20px; }
 .credit__card {
-  background: linear-gradient(135deg, var(--brown-dk) 0%, var(--brown-mid) 100%);
+  background: linear-gradient(135deg, #3d1e08 0%, var(--brown-mid) 55%, var(--accent) 100%);
   border-radius: 20px; padding: 28px;
-  box-shadow: 0 12px 40px rgba(74,55,40,.35);
+  box-shadow: 0 12px 40px rgba(120,60,20,.4);
   color: #fff;
 }
 .credit__card-header {
