@@ -17,10 +17,10 @@ CREATE TABLE IF NOT EXISTS rooms (
 
 -- 객실 기본 데이터 삽입
 INSERT INTO rooms (name, type, description, price, max_weight, status) VALUES
-  ('소형견룸',       'small',  '말티푸·푸들·비숑·포메라니안 등 소형견 전용', 30000, '10kg 이하',  'available'),
-  ('중형견룸',       'medium', '코카·시바·웰시코기 등 중형견 전용',         35000, '10~25kg',   'available'),
-  ('애묘룸',         'cat',    '고양이 전용 독립룸 — 캣타워·숨숨집 완비',   30000, '제한없음',   'available'),
-  ('오션뷰 힐링룸',  'ocean',  '전망 좋은 프리미엄 단독룸',                50000, '25kg 이하',  'available')
+  ('소형견룸',       'small',  '말티푸·푸들·비숑·포메라니안 등 소형견 전용',                             30000, '10kg 이하',  'available'),
+  ('중형견룸',       'medium', '코카·시바·웰시코기 등 중형견 전용',                                       40000, '10~25kg',   'available'),
+  ('애묘룸',         'cat',    '고양이 전용 독립룸 — 캣타워·숨숨집 완비',                                 45000, '제한없음',   'available'),
+  ('오션뷰 힐링룸',  'ocean',  '소·중형견 전용 프리미엄 단독룸 (애묘 이용 불가, 보호자 동반 숙박 불가)',   50000, '25kg 이하',  'available')
 ON CONFLICT DO NOTHING;
 
 
