@@ -1,10 +1,10 @@
 /**
  * MaruStay — AI 알림장 생성 API
  * POST /api/generate-report
- * Claude claude-haiku-20240307 사용 (빠르고 저렴)
+ * OpenAI GPT-4o-mini 사용 (빠르고 저렴, 한국어 우수)
  *
  * 환경 변수 필요:
- *   ANTHROPIC_API_KEY — Anthropic 콘솔에서 발급
+ *   OPENAI_API_KEY — platform.openai.com 에서 발급
  */
 
 module.exports = async function handler(req, res) {
@@ -14,18 +14,13 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-  if (!ANTHROPIC_API_KEY) {
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  if (!OPENAI_API_KEY) {
     return res.status(500).json({
-      error: 'ANTHROPIC_API_KEY가 설정되지 않았습니다. Vercel 환경 변수를 확인해주세요.'
+      error: 'OPENAI_API_KEY가 설정되지 않았습니다. Vercel 환경 변수를 확인해주세요.'
     });
   }
 
@@ -64,20 +59,19 @@ module.exports = async function handler(req, res) {
     petGender ? `성별: ${petGender}` : null,
     '',
     `[${reportDate || '오늘'} 하루 기록]`,
-    `아침 식사: ${mealAm    || '기록 없음'}`,
-    `점심 식사: ${mealPm    || '기록 없음'}`,
+    `아침 식사: ${mealAm     || '기록 없음'}`,
+    `점심 식사: ${mealPm     || '기록 없음'}`,
     `저녁 식사: ${mealEvening || '기록 없음'}`,
     mealNotes   ? `식사 메모: ${mealNotes}` : null,
     `배변: ${bathroomCount ?? 0}회`,
     `활동성: ${activityMap[activityLevel] || activityLevel || '보통'}`,
     `전반적 컨디션: ${moodMap[mood] || mood || '좋음'}`,
-    tempCelsius ? `실내 온도: ${tempCelsius}°C`  : null,
-    humidityPct ? `실내 습도: ${humidityPct}%`   : null,
-    staffNotes  ? `특이사항: ${staffNotes}`       : null,
+    tempCelsius ? `실내 온도: ${tempCelsius}°C` : null,
+    humidityPct ? `실내 습도: ${humidityPct}%`  : null,
+    staffNotes  ? `특이사항: ${staffNotes}`      : null,
   ].filter(Boolean).join('\n');
 
-  const prompt = `당신은 MaruStay의 AI 알림장 작성 도우미입니다.
-반려동물 호텔에서 하루를 보낸 아이의 기록을 보호자님께 따뜻하게 전달하는 알림장을 작성해주세요.
+  const userPrompt = `반려동물 호텔에서 하루를 보낸 아이의 기록을 보호자님께 따뜻하게 전달하는 알림장을 작성해주세요.
 
 ${lines}
 
@@ -90,33 +84,42 @@ ${lines}
 - 불필요한 포맷(제목, 줄바꿈 과다 등) 없이 자연스러운 글 형식으로만 작성`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-20240307',
+        model: 'gpt-4o-mini',
         max_tokens: 600,
-        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.8,
+        messages: [
+          {
+            role: 'system',
+            content: '당신은 MaruStay의 AI 알림장 작성 도우미입니다. 반려동물 호텔에 맡겨진 아이의 하루를 보호자에게 따뜻하고 생생하게 전달합니다.'
+          },
+          {
+            role: 'user',
+            content: userPrompt
+          }
+        ],
       }),
     });
 
     if (!response.ok) {
       const errData = await response.json();
       return res.status(500).json({
-        error: errData.error?.message || 'Claude API 오류가 발생했습니다.'
+        error: errData.error?.message || 'OpenAI API 오류가 발생했습니다.'
       });
     }
 
     const data = await response.json();
-    const reportText = data.content?.[0]?.text || '';
+    const reportText = data.choices?.[0]?.message?.content || '';
 
     return res.status(200).json({ report: reportText });
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-}
+};
