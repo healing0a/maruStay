@@ -295,6 +295,55 @@
       to   { opacity: 1; transform: translate(-50%, 0); }
     }
 
+    /* ── AI 알림장 ── */
+    .report-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+    .rcard { background: var(--cream); border: 1px solid #e8ddd3; border-radius: 10px; padding: 14px 16px; }
+    .rcard-date { font-size: 11px; font-weight: 700; color: #bbb; margin-bottom: 8px; letter-spacing: .04em; }
+    .rcard-text { font-size: 14px; color: #444; line-height: 1.8; white-space: pre-wrap; word-break: keep-all; }
+    .rcard-meta { margin-top: 8px; font-size: 11px; color: #ccc; }
+    .report-form-box { border: 1.5px solid #e8ddd3; border-radius: 12px; padding: 18px; background: #faf8f5; margin-top: 14px; }
+    .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .ff { }
+    .ff label { display: block; font-size: 11px; font-weight: 700; color: #bbb; margin-bottom: 4px; letter-spacing: .03em; }
+    .ff input, .ff select, .ff textarea {
+      width: 100%; padding: 8px 10px;
+      border: 1.5px solid #e4dcd4; border-radius: 8px;
+      font-size: 13px; font-family: inherit; outline: none; background: #fff;
+      transition: border-color .2s;
+    }
+    .ff input:focus, .ff select:focus, .ff textarea:focus { border-color: var(--accent); }
+    .ff.full { grid-column: 1 / -1; }
+    .gen-btn {
+      width: 100%; padding: 13px; margin-top: 14px;
+      background: linear-gradient(135deg, var(--brown-dk) 0%, var(--accent) 100%);
+      color: #fff; border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .gen-btn:hover:not(:disabled) { opacity: .88; }
+    .gen-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .preview-box {
+      margin-top: 16px; background: #fff;
+      border: 1.5px solid var(--sand); border-radius: 12px; padding: 18px;
+    }
+    .preview-label { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: .06em; margin-bottom: 10px; }
+    .preview-text { font-size: 14px; color: #333; line-height: 1.9; word-break: keep-all; white-space: pre-wrap; }
+    .save-rpt-btn {
+      display: inline-block; margin-top: 12px;
+      padding: 9px 22px; background: var(--brown-dk); color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: background .2s;
+    }
+    .save-rpt-btn:hover { background: var(--brown); }
+    .new-rpt-btn {
+      padding: 8px 16px; background: var(--cream);
+      border: 1.5px solid var(--sand); border-radius: 8px;
+      font-size: 13px; font-weight: 600; color: var(--brown);
+      font-family: inherit; cursor: pointer; transition: background .2s;
+    }
+    .new-rpt-btn:hover { background: var(--sand); }
+
     /* ── Responsive ── */
     @media (max-width: 900px) {
       .stats-row { grid-template-columns: repeat(3, 1fr); }
@@ -624,8 +673,10 @@ function renderTable() {
 /* ════════════════════════════════════════════
    MODAL
 ════════════════════════════════════════════ */
-function openModal(id) {
+async function openModal(id) {
   currentId = id;
+  reportFormVisible = false;
+  generatedReport   = null;
   const r = allData.find(x => x.id === id);
   if (!r) return;
   document.getElementById('modalTitle').textContent = `${r.pet_name}  (${r.owner_name})`;
@@ -633,6 +684,8 @@ function openModal(id) {
   renderModalBody(r);
   renderModalActions(r);
   document.getElementById('overlay').classList.add('open');
+  // AI 알림장 비동기 로드
+  loadAndRenderReports(r);
 }
 
 function renderModalBody(r) {
@@ -711,6 +764,83 @@ function renderModalBody(r) {
       <textarea id="memoArea" placeholder="메모를 입력하세요...">${esc(r.admin_memo) || ''}</textarea>
       <button class="save-memo" id="saveMemoBtn" onclick="saveMemo()">메모 저장</button>
     </div>
+
+    <!-- AI 알림장 -->
+    <div class="msec" id="reportSection">
+      <h4>AI 알림장</h4>
+      <div id="reportList"><p style="color:#ccc;font-size:13px">불러오는 중...</p></div>
+      <div style="margin-top:10px">
+        <button class="new-rpt-btn" id="newRptBtn" onclick="toggleReportForm()">✏️ 새 알림장 작성</button>
+      </div>
+      <div id="reportFormWrap" style="display:none">
+        <div class="report-form-box">
+          <div class="fgrid">
+            <div class="ff full">
+              <label>날짜</label>
+              <input type="date" id="rDate" value="${new Date().toISOString().split('T')[0]}">
+            </div>
+            <div class="ff">
+              <label>🌅 아침 식사</label>
+              <input type="text" id="rMealAm" placeholder="예: 사료 100g 완식">
+            </div>
+            <div class="ff">
+              <label>☀️ 점심 식사</label>
+              <input type="text" id="rMealPm" placeholder="예: 간식 1개">
+            </div>
+            <div class="ff">
+              <label>🌙 저녁 식사</label>
+              <input type="text" id="rMealEv" placeholder="예: 사료 80g">
+            </div>
+            <div class="ff">
+              <label>🚾 배변 횟수</label>
+              <input type="number" id="rBathroom" value="0" min="0" max="20">
+            </div>
+            <div class="ff">
+              <label>⚡ 활동성</label>
+              <select id="rActivity">
+                <option value="low">😴 조용함</option>
+                <option value="normal" selected>🙂 보통</option>
+                <option value="high">🐕 활발함</option>
+              </select>
+            </div>
+            <div class="ff">
+              <label>💗 컨디션</label>
+              <select id="rMood">
+                <option value="great">😊 최고예요</option>
+                <option value="good" selected>🙂 좋아요</option>
+                <option value="neutral">😐 보통이에요</option>
+                <option value="tired">😴 피곤해 보여요</option>
+                <option value="anxious">😟 불안해 보여요</option>
+              </select>
+            </div>
+            <div class="ff">
+              <label>🌡 실내 온도 (°C)</label>
+              <input type="number" id="rTemp" placeholder="예: 23.5" step="0.1">
+            </div>
+            <div class="ff">
+              <label>💧 실내 습도 (%)</label>
+              <input type="number" id="rHumid" placeholder="예: 55" min="0" max="100">
+            </div>
+            <div class="ff full">
+              <label>🍽 식사 메모</label>
+              <input type="text" id="rMealNote" placeholder="예: 물을 많이 마셨어요">
+            </div>
+            <div class="ff full">
+              <label>📝 직원 특이사항</label>
+              <textarea id="rNotes" style="min-height:56px" placeholder="보호자에게 특별히 전달할 내용..."></textarea>
+            </div>
+          </div>
+          <button class="gen-btn" id="genBtn" onclick="generateReport()">✨ AI 알림장 생성</button>
+          <div id="reportPreview" style="display:none">
+            <div class="preview-box">
+              <div class="preview-label">✨ AI 생성 알림장 미리보기</div>
+              <div class="preview-text" id="previewText"></div>
+            </div>
+            <button class="save-rpt-btn" id="saveRptBtn" onclick="saveReport()">저장하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
   `;
 }
 
@@ -785,6 +915,146 @@ async function saveMemo() {
   const btn = document.getElementById('saveMemoBtn');
   if (btn) { btn.textContent = '✓ 저장됨'; setTimeout(() => btn.textContent = '메모 저장', 2000); }
   showToast('✓ 메모가 저장되었습니다');
+}
+
+
+/* ════════════════════════════════════════════
+   AI 알림장
+════════════════════════════════════════════ */
+let reportFormVisible = false;
+let generatedReport   = null;
+
+async function loadAndRenderReports(reservation) {
+  const listEl = document.getElementById('reportList');
+  if (!listEl) return;
+
+  const { data: reports, error } = await db
+    .from('ai_reports')
+    .select('*')
+    .eq('reservation_id', reservation.id)
+    .order('report_date', { ascending: false });
+
+  if (error) {
+    listEl.innerHTML = `<p style="color:var(--cancelled);font-size:12px">불러오기 실패: ${error.message}</p>`;
+    return;
+  }
+
+  if (!reports || !reports.length) {
+    listEl.innerHTML = `<p style="color:#ccc;font-size:13px">아직 작성된 알림장이 없어요.</p>`;
+    return;
+  }
+
+  listEl.innerHTML = `<div class="report-list">` +
+    reports.map(r => `
+      <div class="rcard">
+        <div class="rcard-date">📅 ${r.report_date} · 컨디션: ${r.mood} · 활동성: ${r.activity_level} · 배변 ${r.bathroom_count}회</div>
+        <div class="rcard-text">${esc(r.report_content || '내용 없음')}</div>
+      </div>
+    `).join('') + `</div>`;
+}
+
+function toggleReportForm() {
+  reportFormVisible = !reportFormVisible;
+  const wrap = document.getElementById('reportFormWrap');
+  const btn  = document.getElementById('newRptBtn');
+  if (!wrap || !btn) return;
+  wrap.style.display = reportFormVisible ? 'block' : 'none';
+  btn.textContent    = reportFormVisible ? '− 닫기' : '✏️ 새 알림장 작성';
+  // 미리보기 초기화
+  if (!reportFormVisible) {
+    const prev = document.getElementById('reportPreview');
+    if (prev) prev.style.display = 'none';
+    generatedReport = null;
+  }
+}
+
+async function generateReport() {
+  const btn  = document.getElementById('genBtn');
+  const prev = document.getElementById('reportPreview');
+  btn.textContent = '⏳ 생성 중...';
+  btn.disabled = true;
+
+  const r = allData.find(x => x.id === currentId);
+  if (!r) { btn.disabled = false; btn.textContent = '✨ AI 알림장 생성'; return; }
+
+  const payload = {
+    petName:       r.pet_name,
+    petBreed:      r.pet_breed  || '',
+    petAge:        r.pet_age    || '',
+    petGender:     r.pet_gender || '',
+    reportDate:    document.getElementById('rDate')?.value     || new Date().toISOString().split('T')[0],
+    mealAm:        document.getElementById('rMealAm')?.value   || '',
+    mealPm:        document.getElementById('rMealPm')?.value   || '',
+    mealEvening:   document.getElementById('rMealEv')?.value   || '',
+    mealNotes:     document.getElementById('rMealNote')?.value || '',
+    bathroomCount: parseInt(document.getElementById('rBathroom')?.value) || 0,
+    activityLevel: document.getElementById('rActivity')?.value || 'normal',
+    mood:          document.getElementById('rMood')?.value     || 'good',
+    tempCelsius:   document.getElementById('rTemp')?.value     || null,
+    humidityPct:   document.getElementById('rHumid')?.value    || null,
+    staffNotes:    document.getElementById('rNotes')?.value    || '',
+  };
+
+  try {
+    const res  = await fetch('/api/generate-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '생성 실패');
+
+    generatedReport = { payload, text: data.report };
+    document.getElementById('previewText').textContent = data.report;
+    prev.style.display = 'block';
+    btn.textContent = '↺ 다시 생성';
+    btn.disabled    = false;
+
+  } catch (err) {
+    showToast('⚠ ' + err.message);
+    btn.textContent = '✨ AI 알림장 생성';
+    btn.disabled    = false;
+  }
+}
+
+async function saveReport() {
+  if (!generatedReport || !currentId) return;
+  const btn = document.getElementById('saveRptBtn');
+  btn.textContent = '저장 중...';
+  btn.disabled    = true;
+
+  const { payload, text } = generatedReport;
+
+  const { error } = await db.from('ai_reports').upsert({
+    reservation_id: currentId,
+    report_date:    payload.reportDate,
+    meal_am:        payload.mealAm        || null,
+    meal_pm:        payload.mealPm        || null,
+    meal_evening:   payload.mealEvening   || null,
+    meal_notes:     payload.mealNotes     || null,
+    bathroom_count: payload.bathroomCount,
+    activity_level: payload.activityLevel,
+    mood:           payload.mood,
+    temp_celsius:   payload.tempCelsius   ? parseFloat(payload.tempCelsius) : null,
+    humidity_pct:   payload.humidityPct   ? parseInt(payload.humidityPct)   : null,
+    staff_notes:    payload.staffNotes    || null,
+    report_content: text,
+  }, { onConflict: 'reservation_id,report_date' });
+
+  if (error) {
+    showToast('⚠ 저장 실패: ' + error.message);
+    btn.textContent = '저장하기';
+    btn.disabled    = false;
+    return;
+  }
+
+  showToast('✓ 알림장이 저장되었습니다');
+  btn.textContent = '✓ 저장됨';
+  setTimeout(() => { btn.textContent = '저장하기'; btn.disabled = false; }, 2000);
+
+  // 목록 새로고침
+  const reservation = allData.find(x => x.id === currentId);
+  if (reservation) loadAndRenderReports(reservation);
 }
 
 
