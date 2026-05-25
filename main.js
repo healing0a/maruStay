@@ -99,8 +99,15 @@ function showKakaoToast(msg) {
   setTimeout(() => el.remove(), 3500);
 }
 
-/** 페이지 로드 시 세션 복원 */
+/** 페이지 로드 시 SDK 초기화 + 세션 복원 */
 (function initKakaoSession() {
+  // Kakao SDK 초기화
+  if (window.Kakao && !Kakao.isInitialized()) {
+    Kakao.init('66570a122c6141cddd5048bc632d08f7');
+    console.log('[Kakao] SDK 초기화 완료, 버전:', Kakao.VERSION);
+  }
+
+  // 기존 세션 복원
   const stored = localStorage.getItem('marustay_user');
   if (stored) {
     try { updateNavUser(JSON.parse(stored)); } catch (e) {}
