@@ -1,24 +1,69 @@
 // =====================================================
-// 카카오 로그인 & 세션 관리
+// 카카오 로그인 & 세션 관리 (JS SDK 팝업 방식)
 // =====================================================
-const KAKAO_REST_KEY = '45dac14c88de4ae0053c25da92fe425f';
 
-/** 카카오 OAuth 시작 — 인증 페이지로 이동 */
+/** 카카오 팝업 로그인 */
 function startKakaoLogin() {
-  const redirectUri = encodeURIComponent(`${location.origin}/api/auth-kakao`);
-  const scope       = encodeURIComponent('profile_nickname,profile_image');
-  location.href =
-    `https://kauth.kakao.com/oauth/authorize` +
-    `?client_id=${KAKAO_REST_KEY}` +
-    `&redirect_uri=${redirectUri}` +
-    `&response_type=code` +
-    `&scope=${scope}`;
+  if (!window.Kakao || !Kakao.isInitialized()) {
+    showKakaoToast('⚠ 카카오 SDK 로딩 중이에요. 잠시 후 다시 시도해주세요.');
+    return;
+  }
+
+  Kakao.Auth.login({
+    scope: 'profile_nickname,profile_image',
+    success: function() {
+      // 로그인 성공 → 사용자 정보 조회
+      Kakao.API.request({
+        url: '/v2/user/me',
+        success: async function(info) {
+          const user = {
+            kakaoId:  String(info.id),
+            nickname: info.kakao_account?.profile?.nickname
+                   || info.properties?.nickname
+                   || '회원',
+            avatar:   info.kakao_account?.profile?.thumbnail_image_url
+                   || info.properties?.thumbnail_image
+                   || null,
+            email:    info.kakao_account?.email || null,
+          };
+
+          // 세션 저장
+          localStorage.setItem('marustay_user', JSON.stringify(user));
+          updateNavUser(user);
+          showKakaoToast(`🐾 ${user.nickname}님, 환영해요!`);
+
+          // Supabase 저장 (비동기 — 실패해도 로그인은 유지)
+          try {
+            await db.rpc('upsert_kakao_profile', {
+              p_kakao_id:   user.kakaoId,
+              p_nickname:   user.nickname,
+              p_email:      user.email,
+              p_avatar_url: user.avatar,
+            });
+          } catch (e) {
+            console.warn('[Kakao] Supabase 저장 실패 (로그인은 정상):', e);
+          }
+        },
+        fail: function(err) {
+          console.error('[Kakao] 사용자 정보 조회 실패:', err);
+          showKakaoToast('⚠ 사용자 정보를 가져오지 못했어요.');
+        },
+      });
+    },
+    fail: function(err) {
+      console.error('[Kakao] 로그인 실패:', err);
+      showKakaoToast('⚠ 로그인에 실패했어요. 다시 시도해주세요.');
+    },
+  });
 }
 
 /** 로그아웃 */
 function kakaoLogout() {
   localStorage.removeItem('marustay_user');
   updateNavUser(null);
+  if (window.Kakao?.Auth?.getAccessToken()) {
+    Kakao.Auth.logout();
+  }
   showKakaoToast('👋 로그아웃되었어요.');
 }
 
@@ -41,7 +86,7 @@ function updateNavUser(user) {
   }
 }
 
-/** 환영 토스트 */
+/** 토스트 메시지 */
 function showKakaoToast(msg) {
   const el = document.createElement('div');
   el.style.cssText =
@@ -54,38 +99,11 @@ function showKakaoToast(msg) {
   setTimeout(() => el.remove(), 3500);
 }
 
-/** 페이지 로드 시 세션 복원 & 콜백 처리 */
+/** 페이지 로드 시 세션 복원 */
 (function initKakaoSession() {
-  const hash = location.hash;
-
-  if (hash.startsWith('#k=')) {
-    // 로그인 콜백 — hash에서 사용자 정보 파싱
-    try {
-      const encoded = decodeURIComponent(hash.slice(3));
-      const user    = JSON.parse(atob(encoded));
-      localStorage.setItem('marustay_user', JSON.stringify(user));
-      history.replaceState(null, '', location.pathname + location.search);
-      updateNavUser(user);
-      showKakaoToast(`🐾 ${user.nickname}님, 환영해요!`);
-    } catch (e) {
-      console.error('[Kakao] 콜백 파싱 오류:', e);
-    }
-  } else {
-    // 기존 세션 복원
-    const stored = localStorage.getItem('marustay_user');
-    if (stored) {
-      try { updateNavUser(JSON.parse(stored)); } catch (e) {}
-    }
-  }
-
-  // 로그인 취소/오류 안내
-  const params = new URLSearchParams(location.search);
-  if (params.get('kakao') === 'cancelled') {
-    history.replaceState(null, '', location.pathname);
-    showKakaoToast('카카오 로그인이 취소되었어요.');
-  } else if (params.get('kakao') === 'error') {
-    history.replaceState(null, '', location.pathname);
-    showKakaoToast('⚠ 로그인 중 오류가 발생했어요. 다시 시도해주세요.');
+  const stored = localStorage.getItem('marustay_user');
+  if (stored) {
+    try { updateNavUser(JSON.parse(stored)); } catch (e) {}
   }
 })();
 
