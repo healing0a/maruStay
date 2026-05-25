@@ -34,6 +34,17 @@
         <a href="#credit">MaruCredit</a>
         <a href="#faq">FAQ</a>
         <a href="#booking" class="nav__cta">예약하기</a>
+        <!-- 카카오 로그인 -->
+        <button class="nav__kakao-btn" id="navKakaoLogin" onclick="startKakaoLogin()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.477 3 2 6.686 2 11.25c0 2.917 1.74 5.484 4.38 7.01L5.25 22l5.047-2.668A11.3 11.3 0 0012 19.5c5.523 0 10-3.686 10-8.25S17.523 3 12 3z"/></svg>
+          카카오 로그인
+        </button>
+        <!-- 로그인 후 표시 -->
+        <div class="nav__user" id="navUser">
+          <img class="nav__avatar" id="navAvatar" src="" alt="프로필" />
+          <span class="nav__uname" id="navNickname"></span>
+          <button class="nav__logout" onclick="kakaoLogout()">로그아웃</button>
+        </div>
       </nav>
     </div>
   </header>
