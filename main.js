@@ -1,3 +1,95 @@
+// =====================================================
+// 카카오 로그인 & 세션 관리
+// =====================================================
+const KAKAO_REST_KEY = '45dac14c88de4ae0053c25da92fe425f';
+
+/** 카카오 OAuth 시작 — 인증 페이지로 이동 */
+function startKakaoLogin() {
+  const redirectUri = encodeURIComponent(`${location.origin}/api/auth-kakao`);
+  const scope       = encodeURIComponent('profile_nickname,profile_image');
+  location.href =
+    `https://kauth.kakao.com/oauth/authorize` +
+    `?client_id=${KAKAO_REST_KEY}` +
+    `&redirect_uri=${redirectUri}` +
+    `&response_type=code` +
+    `&scope=${scope}`;
+}
+
+/** 로그아웃 */
+function kakaoLogout() {
+  localStorage.removeItem('marustay_user');
+  updateNavUser(null);
+  showKakaoToast('👋 로그아웃되었어요.');
+}
+
+/** Nav 사용자 UI 갱신 */
+function updateNavUser(user) {
+  const loginBtn = document.getElementById('navKakaoLogin');
+  const userDiv  = document.getElementById('navUser');
+  if (!loginBtn || !userDiv) return;
+
+  if (user) {
+    loginBtn.style.display = 'none';
+    userDiv.style.display  = 'flex';
+    const avatar   = document.getElementById('navAvatar');
+    const nickname = document.getElementById('navNickname');
+    if (avatar)   avatar.src          = user.avatar || 'images/maru.jpg';
+    if (nickname) nickname.textContent = user.nickname || '회원';
+  } else {
+    loginBtn.style.display = '';
+    userDiv.style.display  = 'none';
+  }
+}
+
+/** 환영 토스트 */
+function showKakaoToast(msg) {
+  const el = document.createElement('div');
+  el.style.cssText =
+    'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);' +
+    'background:#4a3728;color:#fff;padding:14px 28px;border-radius:50px;' +
+    'box-shadow:0 8px 32px rgba(0,0,0,.25);font-size:15px;font-weight:600;' +
+    'z-index:9999;white-space:nowrap;animation:fadeUp .35s ease;';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+/** 페이지 로드 시 세션 복원 & 콜백 처리 */
+(function initKakaoSession() {
+  const hash = location.hash;
+
+  if (hash.startsWith('#k=')) {
+    // 로그인 콜백 — hash에서 사용자 정보 파싱
+    try {
+      const encoded = decodeURIComponent(hash.slice(3));
+      const user    = JSON.parse(atob(encoded));
+      localStorage.setItem('marustay_user', JSON.stringify(user));
+      history.replaceState(null, '', location.pathname + location.search);
+      updateNavUser(user);
+      showKakaoToast(`🐾 ${user.nickname}님, 환영해요!`);
+    } catch (e) {
+      console.error('[Kakao] 콜백 파싱 오류:', e);
+    }
+  } else {
+    // 기존 세션 복원
+    const stored = localStorage.getItem('marustay_user');
+    if (stored) {
+      try { updateNavUser(JSON.parse(stored)); } catch (e) {}
+    }
+  }
+
+  // 로그인 취소/오류 안내
+  const params = new URLSearchParams(location.search);
+  if (params.get('kakao') === 'cancelled') {
+    history.replaceState(null, '', location.pathname);
+    showKakaoToast('카카오 로그인이 취소되었어요.');
+  } else if (params.get('kakao') === 'error') {
+    history.replaceState(null, '', location.pathname);
+    showKakaoToast('⚠ 로그인 중 오류가 발생했어요. 다시 시도해주세요.');
+  }
+})();
+
+// =====================================================
 // Nav scroll
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {
