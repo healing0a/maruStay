@@ -143,6 +143,16 @@ body {
 }
 .nav__cta:hover { background: #c07a50 !important; }
 
+/* 내 예약 링크 (로그인 시에만 표시) */
+.nav__mypage {
+  display: none;   /* JS에서 보여줌 */
+  font-size: 14px; font-weight: 600;
+  color: var(--accent-lt) !important;
+  white-space: nowrap;
+}
+.nav__mypage:hover { color: #fff !important; }
+.nav.scrolled .nav__mypage { color: var(--accent) !important; }
+
 /* 카카오 로그인 버튼 */
 .nav__kakao-btn {
   display: flex; align-items: center; gap: 6px;

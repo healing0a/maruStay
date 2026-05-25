@@ -30,9 +30,11 @@ function updateNavUser(user) {
   const userDiv  = document.getElementById('navUser');
   if (!loginBtn || !userDiv) return;
 
+  const mypage = document.getElementById('navMypage');
   if (user) {
     loginBtn.style.display = 'none';
     userDiv.style.display  = 'flex';
+    if (mypage) mypage.style.display = '';
     const avatar   = document.getElementById('navAvatar');
     const nickname = document.getElementById('navNickname');
     if (avatar)   avatar.src          = user.avatar || 'images/maru.jpg';
@@ -40,6 +42,7 @@ function updateNavUser(user) {
   } else {
     loginBtn.style.display = '';
     userDiv.style.display  = 'none';
+    if (mypage) mypage.style.display = 'none';
   }
 }
 
