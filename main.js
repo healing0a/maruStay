@@ -71,7 +71,10 @@ function showKakaoToast(msg) {
   if (hash.startsWith('#k=')) {
     try {
       const encoded = decodeURIComponent(hash.slice(3));
-      const user    = JSON.parse(atob(encoded));
+      // UTF-8 한글 안전 디코딩
+      const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
+      const json  = new TextDecoder().decode(bytes);
+      const user  = JSON.parse(json);
       localStorage.setItem('marustay_user', JSON.stringify(user));
       history.replaceState(null, '', location.pathname + location.search);
       updateNavUser(user);

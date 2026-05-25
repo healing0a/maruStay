@@ -82,10 +82,10 @@ module.exports = async function handler(req, res) {
     }
 
     // ── 4. 클라이언트로 사용자 정보 전달 (hash fragment) ─────
-    // hash는 서버로 전송되지 않아 상대적으로 안전
-    const payload = encodeURIComponent(
-      Buffer.from(JSON.stringify({ kakaoId, nickname, avatar, email })).toString('base64')
-    );
+    // 한글 닉네임 등 non-ASCII 문자를 \uXXXX 이스케이프 후 base64
+    const safeJson = JSON.stringify({ kakaoId, nickname, avatar, email })
+      .replace(/[-￿]/g, c => '\\u' + ('000' + c.charCodeAt(0).toString(16)).slice(-4));
+    const payload = encodeURIComponent(Buffer.from(safeJson).toString('base64'));
     return res.redirect(`/#k=${payload}`);
 
   } catch (err) {
