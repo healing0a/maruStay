@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 중...</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh;
+      background: #fff8ec;
+      font-family: sans-serif;
+      font-size: 16px; color: #7a4520;
+    }
+  </style>
+</head>
+<body>
+  🐾 로그인 처리 중...
+  <script>
+    (function() {
+      try {
+        const p = new URLSearchParams(location.search);
+        const user = {
+          kakaoId:  p.get('kid')  || '',
+          nickname: p.get('nick') || '회원',
+          avatar:   p.get('av')   || null,
+          email:    p.get('em')   || null,
+        };
+        if (!user.avatar)  user.avatar  = null;
+        if (!user.email)   user.email   = null;
+
+        localStorage.setItem('marustay_user', JSON.stringify(user));
+        // 홈으로 이동하면서 환영 플래그 전달
+        location.replace('/?kakao=ok');
+      } catch(e) {
+        location.replace('/?kakao=error');
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -66,31 +66,28 @@ function showKakaoToast(msg) {
     Kakao.init('66570a122c6141cddd5048bc632d08f7');
   }
 
-  // 로그인 콜백 — api/auth-kakao.js 가 /#k=BASE64 로 리다이렉트
-  const hash = location.hash;
-  if (hash.startsWith('#k=')) {
-    try {
-      const encoded = decodeURIComponent(hash.slice(3));
-      // UTF-8 한글 안전 디코딩
-      const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
-      const json  = new TextDecoder().decode(bytes);
-      const user  = JSON.parse(json);
-      localStorage.setItem('marustay_user', JSON.stringify(user));
-      history.replaceState(null, '', location.pathname + location.search);
-      updateNavUser(user);
-      showKakaoToast(`🐾 ${user.nickname}님, 환영해요!`);
-    } catch (e) {
-      console.error('[Kakao] 콜백 파싱 오류:', e);
+  // 로그인 결과 파라미터 처리
+  const params = new URLSearchParams(location.search);
+  const kakaoParam = params.get('kakao');
+
+  if (kakaoParam === 'ok') {
+    // kakao-done.html 이 localStorage에 저장 완료 후 이동한 상태
+    history.replaceState(null, '', location.pathname);
+    const stored = localStorage.getItem('marustay_user');
+    if (stored) {
+      try {
+        const user = JSON.parse(stored);
+        updateNavUser(user);
+        showKakaoToast(`🐾 ${user.nickname}님, 환영해요!`);
+      } catch (e) {}
     }
     return;
   }
 
-  // 오류 파라미터
-  const params = new URLSearchParams(location.search);
-  if (params.get('kakao') === 'cancelled') {
+  if (kakaoParam === 'cancelled') {
     history.replaceState(null, '', location.pathname);
     showKakaoToast('카카오 로그인이 취소되었어요.');
-  } else if (params.get('kakao') === 'error') {
+  } else if (kakaoParam === 'error') {
     history.replaceState(null, '', location.pathname);
     showKakaoToast('⚠ 로그인 중 오류가 발생했어요. 다시 시도해주세요.');
   }
