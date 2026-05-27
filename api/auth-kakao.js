@@ -20,9 +20,8 @@ module.exports = async function handler(req, res) {
     return res.redirect('/?kakao=cancelled');
   }
 
-  const proto       = req.headers['x-forwarded-proto'] || 'https';
-  const host        = req.headers['x-forwarded-host']  || req.headers.host;
-  const redirectUri = `${proto}://${host}/api/auth-kakao`;
+  // 카카오 개발자 콘솔에 등록한 URI와 정확히 일치해야 함
+  const redirectUri = 'https://maru-stay.vercel.app/api/auth-kakao';
 
   try {
     // ── 1. code → access_token ──────────────────────────────
