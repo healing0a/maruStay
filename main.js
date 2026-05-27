@@ -84,9 +84,8 @@ function showKakaoToast(msg) {
     history.replaceState(null, '', location.pathname);
     showKakaoToast('카카오 로그인이 취소되었어요.');
   } else if (kakaoParam === 'error') {
-    const msg = params.get('msg') || '알 수 없는 오류';
     history.replaceState(null, '', location.pathname);
-    alert('[카카오 로그인 오류]\n' + decodeURIComponent(msg));
+    showKakaoToast('카카오 로그인 중 오류가 발생했어요. 다시 시도해주세요.');
   }
 
   // 기존 세션 복원
