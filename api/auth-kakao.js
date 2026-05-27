@@ -9,7 +9,8 @@
  *  4. /kakao-done.html?... 로 리다이렉트 (중간 페이지가 localStorage 저장 후 홈으로 이동)
  */
 
-const KAKAO_REST_API_KEY = '45dac14c88de4ae0053c25da92fe425f';
+const KAKAO_REST_API_KEY    = '45dac14c88de4ae0053c25da92fe425f';
+const KAKAO_CLIENT_SECRET  = '7umJ1sumJBzYgjgVSxyuAR96Rq1isCni';
 const SUPABASE_URL       = 'https://sjzxpqtkpaehazwtonge.supabase.co';
 const SUPABASE_ANON_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqenhwcXRrcGFlaGF6d3RvbmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTYwMTMsImV4cCI6MjA5NTE5MjAxM30.M8CqLiIQeOSfoWh-rpQ-lkrnUEWhU9pS7v72vUZfxIs';
 
@@ -29,9 +30,10 @@ module.exports = async function handler(req, res) {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
       body: new URLSearchParams({
-        grant_type:   'authorization_code',
-        client_id:    KAKAO_REST_API_KEY,
-        redirect_uri: redirectUri,
+        grant_type:    'authorization_code',
+        client_id:     KAKAO_REST_API_KEY,
+        client_secret: KAKAO_CLIENT_SECRET,
+        redirect_uri:  redirectUri,
         code,
       }),
     });
