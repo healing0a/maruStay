@@ -2,16 +2,17 @@
 // 카카오 로그인 & 세션 관리 (JS SDK 팝업 방식)
 // =====================================================
 
-/** 카카오 로그인 — Kakao.Auth.authorize() 리다이렉트 방식 (SDK v2) */
+/** 카카오 로그인 — REST API 키로 직접 리다이렉트 (JS SDK 사용 안 함) */
 function startKakaoLogin() {
-  if (!window.Kakao || !Kakao.isInitialized()) {
-    showKakaoToast('⚠ 카카오 SDK 로딩 중이에요. 잠시 후 다시 시도해주세요.');
-    return;
-  }
-  Kakao.Auth.authorize({
-    redirectUri: `${location.origin}/api/auth-kakao`,
-    scope: 'profile_nickname,profile_image',
-  });
+  const KAKAO_REST_KEY  = '45dac14c88de4ae0053c25da92fe425f';
+  const redirectUri     = encodeURIComponent('https://maru-stay.vercel.app/api/auth-kakao');
+  const scope           = encodeURIComponent('profile_nickname,profile_image');
+  location.href =
+    `https://kauth.kakao.com/oauth/authorize` +
+    `?client_id=${KAKAO_REST_KEY}` +
+    `&redirect_uri=${redirectUri}` +
+    `&response_type=code` +
+    `&scope=${scope}`;
 }
 
 /** 로그아웃 */
@@ -61,11 +62,6 @@ function showKakaoToast(msg) {
 
 /** 페이지 로드 시 SDK 초기화 + 콜백 처리 + 세션 복원 */
 (function initKakaoSession() {
-  // Kakao SDK 초기화
-  if (window.Kakao && !Kakao.isInitialized()) {
-    Kakao.init('66570a122c6141cddd5048bc632d08f7');
-  }
-
   // 로그인 결과 파라미터 처리
   const params = new URLSearchParams(location.search);
   const kakaoParam = params.get('kakao');
