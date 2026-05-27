@@ -37,7 +37,7 @@ body {
 }
 
 /* ===== TYPOGRAPHY ===== */
-.section__header { text-align: center; margin-bottom: 52px; }
+.section__header { text-align: center; margin-bottom: 40px; }
 .section__label {
   display: block;
   font-size: 11px;
@@ -61,7 +61,7 @@ body {
 
 /* ===== LAYOUT ===== */
 .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
-.section { padding: 88px 0; }
+.section { padding: 68px 0; }
 
 /* ===== BUTTONS ===== */
 .btn {
@@ -279,7 +279,7 @@ body {
   font-size: 16px; line-height: 1.85;
   margin-bottom: 36px;
 }
-.hero__actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 48px; }
+.hero__actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 32px; }
 .hero__features {
   display: flex; flex-wrap: wrap; gap: 10px;
 }
@@ -352,7 +352,7 @@ body {
 .about { background: var(--white); }
 .compare__grid {
   display: flex; gap: 0; align-items: stretch;
-  margin-bottom: 64px;
+  margin-bottom: 48px;
 }
 .compare__card {
   flex: 1;
@@ -465,7 +465,7 @@ body {
 /* ===== PRICING ===== */
 .pricing { background: var(--white); }
 .pricing__grid {
-  display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; align-items: start;
+  display: grid; grid-template-columns: 1.3fr 1fr; gap: 36px; align-items: start;
 }
 .pricing__table {
   border-radius: var(--radius);
@@ -528,7 +528,7 @@ body {
 /* ===== HI-ORDER ===== */
 .hiorder { background: var(--sand); }
 .hiorder__grid {
-  display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
 }
 .hiorder__card {
   background: var(--white);
@@ -554,7 +554,7 @@ body {
 /* ===== CREDIT ===== */
 .credit { background: var(--white); }
 .credit__grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;
 }
 .credit__desc { color: var(--text-mid); margin-bottom: 28px; font-size: 16px; line-height: 1.85; }
 .credit__benefits { display: flex; flex-direction: column; gap: 20px; }
@@ -809,6 +809,9 @@ body {
   .rooms__grid { grid-template-columns: repeat(2, 1fr); }
   .hiorder__grid { grid-template-columns: repeat(3, 1fr); }
 }
+@media (max-width: 760px) {
+  .hiorder__grid { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 860px) {
   .hero { flex-direction: column; justify-content: center; text-align: center; }
   .hero__actions { justify-content: center; }
@@ -848,5 +851,5 @@ body {
   .form__check-row { flex-direction: column; gap: 14px; }
   .report__stats { grid-template-columns: repeat(2, 1fr); }
   .footer__bottom { flex-direction: column; }
-  .section { padding: 60px 0; }
+  .section { padding: 48px 0; }
 }
