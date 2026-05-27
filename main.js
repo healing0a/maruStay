@@ -25,6 +25,15 @@ function kakaoLogout() {
   showKakaoToast('👋 로그아웃되었어요.');
 }
 
+/** 예약 폼 자동입력 (로그인 후) */
+function prefillBookingForm(user) {
+  if (!user) return;
+  const nameEl  = document.getElementById('ownerName');
+  const emailEl = document.getElementById('ownerEmail');
+  if (nameEl  && !nameEl.value  && user.nickname) nameEl.value  = user.nickname;
+  if (emailEl && !emailEl.value && user.email)    emailEl.value = user.email;
+}
+
 /** Nav 사용자 UI 갱신 */
 function updateNavUser(user) {
   const loginBtn = document.getElementById('navKakaoLogin');
@@ -74,6 +83,7 @@ function showKakaoToast(msg) {
       try {
         const user = JSON.parse(stored);
         updateNavUser(user);
+        prefillBookingForm(user);
         showKakaoToast(`🐾 ${user.nickname}님, 환영해요!`);
       } catch (e) {}
     }
@@ -91,7 +101,11 @@ function showKakaoToast(msg) {
   // 기존 세션 복원
   const stored = localStorage.getItem('marustay_user');
   if (stored) {
-    try { updateNavUser(JSON.parse(stored)); } catch (e) {}
+    try {
+      const user = JSON.parse(stored);
+      updateNavUser(user);
+      prefillBookingForm(user);
+    } catch (e) {}
   }
 })();
 

@@ -74,47 +74,7 @@
       flex-shrink: 0;
     }
     .user-name  { font-size: 16px; font-weight: 700; }
-    .user-phone { font-size: 13px; color: var(--brown); margin-top: 3px; }
-    .change-phone {
-      margin-left: auto; font-size: 12px;
-      color: var(--brown); background: none;
-      border: 1px solid var(--sand); border-radius: 12px;
-      padding: 4px 10px; cursor: pointer;
-      font-family: 'Pretendard', sans-serif; flex-shrink: 0;
-    }
-    .change-phone:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* PHONE FORM */
-    .phone-section {
-      background: #fff;
-      border-radius: 16px;
-      padding: 22px 20px;
-      margin-top: 20px;
-      box-shadow: 0 2px 16px rgba(140,80,20,.08);
-    }
-    .phone-section label {
-      display: block; font-size: 13px; font-weight: 600;
-      color: var(--brown); margin-bottom: 8px;
-    }
-    .phone-section p {
-      font-size: 13px; color: var(--brown); margin-bottom: 16px; line-height: 1.6;
-    }
-    .phone-row { display: flex; gap: 8px; }
-    .phone-section input {
-      flex: 1; border: 1.5px solid var(--sand); border-radius: 10px;
-      padding: 12px 14px; font-size: 15px;
-      font-family: 'Pretendard', sans-serif;
-      outline: none; transition: border-color .2s;
-    }
-    .phone-section input:focus { border-color: var(--accent); }
-    .btn-search {
-      background: var(--accent); color: #fff;
-      border: none; border-radius: 10px;
-      padding: 0 22px; font-size: 14px; font-weight: 700;
-      font-family: 'Pretendard', sans-serif;
-      cursor: pointer; white-space: nowrap;
-    }
-    .btn-search:hover { background: #b06828; }
+    .user-sub   { font-size: 13px; color: var(--brown); margin-top: 3px; }
 
     /* RESULTS */
     #results { margin-top: 16px; }
@@ -161,7 +121,7 @@
     .res-info { font-size: 13px; color: var(--brown); line-height: 2; }
     .res-info strong { color: var(--text); }
 
-    .res-footer { margin-top: 12px; }
+    .res-footer { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-report {
       display: inline-flex; align-items: center; gap: 6px;
       background: var(--cream); color: var(--brown);
@@ -199,21 +159,11 @@
 
       <!-- 사용자 카드 -->
       <div class="user-card">
-        <img class="user-avatar" id="userAvatar" src="" alt="프로필">
+        <img class="user-avatar" id="userAvatar" src="" alt="프로필"
+             onerror="this.src='images/maru.jpg'">
         <div>
           <div class="user-name" id="userName"></div>
-          <div class="user-phone" id="userPhone"></div>
-        </div>
-        <button class="change-phone" id="changePhoneBtn" onclick="showPhoneForm()" style="display:none">연락처 변경</button>
-      </div>
-
-      <!-- 연락처 입력 폼 (처음 방문 or 변경 시) -->
-      <div class="phone-section" id="phoneSection" style="display:none">
-        <p>예약 시 등록한 연락처를 입력해주세요.<br>한 번 입력하면 다음엔 자동으로 조회돼요.</p>
-        <label for="phoneInput">연락처</label>
-        <div class="phone-row">
-          <input type="tel" id="phoneInput" placeholder="010-0000-0000" maxlength="13">
-          <button class="btn-search" onclick="saveAndSearch()">조회</button>
+          <div class="user-sub">카카오 로그인으로 조회 중</div>
         </div>
       </div>
 
@@ -236,10 +186,10 @@
       cancelled:   { text: '취소됨',       cls: 'status-cancelled' },
     };
     const ROOM = {
+      '소형견룸': '소형견룸', '중형견룸': '중형견룸',
+      '애묘룸': '애묘룸', '오션뷰 힐링룸': '오션뷰 힐링룸',
       small: '소형견룸', medium: '중형견룸', cat: '애묘룸', ocean: '오션뷰 힐링룸',
     };
-
-    let currentUser = null;
 
     // ── 초기화 ──────────────────────────────────────────────
     (function init() {
@@ -249,75 +199,40 @@
         return;
       }
       try {
-        currentUser = JSON.parse(stored);
-        document.getElementById('loggedIn').style.display = 'block';
-        document.getElementById('userAvatar').src = currentUser.avatar || '';
-        document.getElementById('userName').textContent = currentUser.nickname + '님';
-
-        // 저장된 연락처가 있으면 자동 조회
-        const savedPhone = localStorage.getItem('marustay_phone');
-        if (savedPhone) {
-          document.getElementById('userPhone').textContent = savedPhone;
-          document.getElementById('changePhoneBtn').style.display = 'block';
-          searchReservations(savedPhone);
-        } else {
-          // 처음 방문 — 연락처 입력 폼 보여주기
-          document.getElementById('phoneSection').style.display = 'block';
+        const user = JSON.parse(stored);
+        if (!user.kakaoId) {
+          document.getElementById('loginRequired').style.display = 'block';
+          return;
         }
+        document.getElementById('loggedIn').style.display = 'block';
+        document.getElementById('userAvatar').src = user.avatar || 'images/maru.jpg';
+        document.getElementById('userName').textContent = user.nickname + '님';
+
+        // kakao_id로 바로 조회 — 전화번호 입력 불필요
+        loadReservations(user.kakaoId);
       } catch (e) {
         document.getElementById('loginRequired').style.display = 'block';
       }
     })();
 
-    // ── 전화번호 자동 포맷 ───────────────────────────────────
-    document.getElementById('phoneInput').addEventListener('input', function() {
-      let v = this.value.replace(/\D/g, '');
-      if (v.length <= 3)       this.value = v;
-      else if (v.length <= 7)  this.value = v.slice(0,3) + '-' + v.slice(3);
-      else                     this.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7,11);
-    });
-    document.getElementById('phoneInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') saveAndSearch();
-    });
-
-    // ── 연락처 저장 후 조회 ──────────────────────────────────
-    function saveAndSearch() {
-      const phone = document.getElementById('phoneInput').value.trim();
-      if (!phone) { alert('연락처를 입력해주세요.'); return; }
-      localStorage.setItem('marustay_phone', phone);
-      document.getElementById('userPhone').textContent = phone;
-      document.getElementById('changePhoneBtn').style.display = 'block';
-      document.getElementById('phoneSection').style.display = 'none';
-      searchReservations(phone);
-    }
-
-    // ── 연락처 변경 ──────────────────────────────────────────
-    function showPhoneForm() {
-      const phoneSection = document.getElementById('phoneSection');
-      phoneSection.style.display = phoneSection.style.display === 'none' ? 'block' : 'none';
-      if (phoneSection.style.display === 'block') {
-        const saved = localStorage.getItem('marustay_phone') || '';
-        document.getElementById('phoneInput').value = saved;
-        document.getElementById('phoneInput').focus();
-      }
-    }
-
     // ── 예약 조회 ────────────────────────────────────────────
-    async function searchReservations(phone) {
+    async function loadReservations(kakaoId) {
       const results = document.getElementById('results');
       results.innerHTML = '<div class="loading">🔍 예약 내역 조회 중...</div>';
 
-      const { data, error } = await db.rpc('get_my_reservations', { p_phone: phone });
+      const { data, error } = await db.rpc('get_my_reservations_by_kakao', {
+        p_kakao_id: kakaoId
+      });
 
       if (error) {
-        results.innerHTML = '<div class="empty"><div class="icon">⚠️</div>조회 중 오류가 발생했어요.</div>';
+        results.innerHTML = '<div class="empty"><div class="icon">⚠️</div>조회 중 오류가 발생했어요.<br><small style="color:#aaa">' + error.message + '</small></div>';
         return;
       }
       if (!data || data.length === 0) {
         results.innerHTML = `<div class="empty">
           <div class="icon">📋</div>
-          해당 연락처로 등록된 예약이 없어요.<br><br>
-          <a href="/#booking" style="color:var(--accent);font-weight:600;">예약 신청하러 가기 →</a>
+          아직 예약 내역이 없어요.<br><br>
+          <a href="/#booking" style="color:var(--accent);font-weight:600;">첫 예약 신청하러 가기 →</a>
         </div>`;
         return;
       }
@@ -331,7 +246,7 @@
       const st     = STATUS[r.status] || { text: r.status, cls: 'status-pending' };
       const room   = ROOM[r.room_type] || r.room_type || '미정';
       const fmt    = d => d ? new Date(d).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' }) : '-';
-      const report = (r.status === 'checked_in' || r.status === 'checked_out');
+      const canReport = (r.status === 'checked_in' || r.status === 'checked_out');
 
       return `
         <div class="res-card ${r.status}">
@@ -347,7 +262,7 @@
             <div>📅 <strong>체크아웃</strong> ${fmt(r.checkout_date)}</div>
             <div>🏠 <strong>객실</strong>&nbsp;&nbsp;&nbsp; ${room}</div>
           </div>
-          ${report ? `<div class="res-footer">
+          ${canReport ? `<div class="res-footer">
             <a class="btn-report" href="report.html?rid=${r.id}">📋 AI 알림장 보기</a>
           </div>` : ''}
         </div>`;

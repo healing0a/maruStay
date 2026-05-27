@@ -12,6 +12,11 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 // 예약 신청 저장 (SECURITY DEFINER RPC 함수 사용)
 // =====================================================
 async function submitReservation(formData) {
+  // 로그인 상태면 kakao_id 자동 포함
+  const storedUser = localStorage.getItem('marustay_user');
+  let kakaoId = null;
+  if (storedUser) { try { kakaoId = JSON.parse(storedUser).kakaoId || null; } catch(e) {} }
+
   const { data, error } = await db.rpc('submit_reservation_request', {
     p_owner_name:        formData.owner_name,
     p_owner_phone:       formData.owner_phone,
@@ -42,6 +47,7 @@ async function submitReservation(formData) {
     p_consent_cctv:      formData.consent_cctv,
     p_consent_ai:        formData.consent_ai,
     p_consent_marketing: formData.consent_marketing,
+    p_kakao_id:          kakaoId,
   });
 
   if (error) throw error;
