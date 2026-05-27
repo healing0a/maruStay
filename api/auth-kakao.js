@@ -38,8 +38,14 @@ module.exports = async function handler(req, res) {
     const token = await tokenRes.json();
 
     if (!token.access_token) {
-      // 디버그: 에러 전체를 화면에 표시
-      const errMsg = encodeURIComponent(JSON.stringify(token));
+      // 디버그: 에러 + 실제 사용된 파라미터 표시
+      const errMsg = encodeURIComponent(JSON.stringify({
+        kakao_error: token,
+        _debug_used: {
+          client_id: KAKAO_REST_API_KEY,
+          redirect_uri: redirectUri,
+        },
+      }));
       return res.redirect(`/?kakao=error&msg=${errMsg}`);
     }
 
