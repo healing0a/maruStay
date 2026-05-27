@@ -34,7 +34,7 @@ function updateNavUser(user) {
   if (user) {
     loginBtn.style.display = 'none';
     userDiv.style.display  = 'flex';
-    if (mypage) mypage.style.display = '';
+    if (mypage) mypage.style.display = 'block';
     const avatar   = document.getElementById('navAvatar');
     const nickname = document.getElementById('navNickname');
     if (avatar)   avatar.src          = user.avatar || 'images/maru.jpg';

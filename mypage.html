@@ -25,108 +25,132 @@
     }
     .container { max-width: 520px; margin: 0 auto; padding: 0 16px 60px; }
 
-    /* ── HEADER ── */
+    /* HEADER */
     .header {
       background: linear-gradient(145deg, var(--brown-dk) 0%, #7a4520 100%);
-      padding: 28px 20px 32px;
+      padding: 24px 20px 28px;
       text-align: center;
       color: #fff;
     }
-    .header-logo { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-    .header-sub  { font-size: 13px; opacity: .65; }
-
-    /* ── LOGIN REQUIRED ── */
-    .login-required {
-      text-align: center;
-      padding: 60px 20px;
-    }
-    .login-required .icon  { font-size: 48px; margin-bottom: 16px; }
-    .login-required h2     { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-    .login-required p      { font-size: 14px; color: var(--brown); margin-bottom: 24px; }
-    .btn-kakao {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: #fee500; color: #191919;
-      border: none; border-radius: 50px;
-      padding: 13px 28px; font-size: 15px; font-weight: 700;
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      color: rgba(255,255,255,.65); font-size: 13px;
+      text-decoration: none; margin-bottom: 10px;
+      background: none; border: none; cursor: pointer;
       font-family: 'Pretendard', sans-serif;
-      cursor: pointer; text-decoration: none;
+    }
+    .back-btn:hover { color: #fff; }
+    .header-logo { font-size: 20px; font-weight: 700; }
+    .header-sub  { font-size: 12px; opacity: .6; margin-top: 2px; }
+
+    /* LOGIN REQUIRED */
+    .login-required {
+      text-align: center; padding: 60px 20px;
+    }
+    .login-required .icon { font-size: 48px; margin-bottom: 16px; }
+    .login-required h2    { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .login-required p     { font-size: 14px; color: var(--brown); margin-bottom: 24px; }
+    .btn-home {
+      display: inline-block;
+      background: var(--accent); color: #fff;
+      border-radius: 50px; padding: 12px 28px;
+      font-size: 15px; font-weight: 700;
+      font-family: 'Pretendard', sans-serif;
+      text-decoration: none;
     }
 
-    /* ── PHONE FORM ── */
+    /* USER CARD */
+    .user-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 2px 16px rgba(140,80,20,.08);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .user-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      object-fit: cover; border: 2px solid var(--sand);
+      flex-shrink: 0;
+    }
+    .user-name  { font-size: 16px; font-weight: 700; }
+    .user-phone { font-size: 13px; color: var(--brown); margin-top: 3px; }
+    .change-phone {
+      margin-left: auto; font-size: 12px;
+      color: var(--brown); background: none;
+      border: 1px solid var(--sand); border-radius: 12px;
+      padding: 4px 10px; cursor: pointer;
+      font-family: 'Pretendard', sans-serif; flex-shrink: 0;
+    }
+    .change-phone:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* PHONE FORM */
     .phone-section {
       background: #fff;
       border-radius: 16px;
-      padding: 24px 20px;
-      margin-top: 24px;
+      padding: 22px 20px;
+      margin-top: 20px;
       box-shadow: 0 2px 16px rgba(140,80,20,.08);
     }
-    .user-greeting {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 20px;
-    }
-    .user-avatar {
-      width: 44px; height: 44px; border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--sand);
-    }
-    .user-name { font-size: 16px; font-weight: 700; }
-    .user-name span { color: var(--accent); }
-
-    .phone-form label {
+    .phone-section label {
       display: block; font-size: 13px; font-weight: 600;
       color: var(--brown); margin-bottom: 8px;
     }
+    .phone-section p {
+      font-size: 13px; color: var(--brown); margin-bottom: 16px; line-height: 1.6;
+    }
     .phone-row { display: flex; gap: 8px; }
-    .phone-form input {
-      flex: 1;
-      border: 1.5px solid var(--sand);
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 15px; font-family: 'Pretendard', sans-serif;
+    .phone-section input {
+      flex: 1; border: 1.5px solid var(--sand); border-radius: 10px;
+      padding: 12px 14px; font-size: 15px;
+      font-family: 'Pretendard', sans-serif;
       outline: none; transition: border-color .2s;
     }
-    .phone-form input:focus { border-color: var(--accent); }
+    .phone-section input:focus { border-color: var(--accent); }
     .btn-search {
       background: var(--accent); color: #fff;
       border: none; border-radius: 10px;
-      padding: 0 20px; font-size: 14px; font-weight: 700;
+      padding: 0 22px; font-size: 14px; font-weight: 700;
       font-family: 'Pretendard', sans-serif;
       cursor: pointer; white-space: nowrap;
     }
     .btn-search:hover { background: #b06828; }
 
-    /* ── RESULTS ── */
-    #results { margin-top: 20px; }
-
+    /* RESULTS */
+    #results { margin-top: 16px; }
+    .section-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--brown); margin: 20px 0 12px;
+    }
     .empty {
       text-align: center; padding: 40px 20px;
-      color: var(--brown); font-size: 14px;
+      color: var(--brown); font-size: 14px; line-height: 1.7;
     }
     .empty .icon { font-size: 40px; margin-bottom: 12px; }
 
     .res-card {
       background: #fff;
       border-radius: 16px;
-      padding: 20px;
+      padding: 18px 20px;
       margin-bottom: 12px;
       box-shadow: 0 2px 16px rgba(140,80,20,.08);
       border-left: 4px solid var(--accent);
     }
-    .res-card.cancelled { border-left-color: #ccc; opacity: .75; }
-    .res-card.confirmed { border-left-color: #5aaa50; }
-    .res-card.checked_in { border-left-color: #3a82f7; }
+    .res-card.confirmed   { border-left-color: #5aaa50; }
+    .res-card.checked_in  { border-left-color: #3a82f7; }
+    .res-card.checked_out { border-left-color: #9c6fc8; }
+    .res-card.cancelled   { border-left-color: #ccc; opacity: .7; }
 
     .res-header {
       display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 12px;
     }
-    .res-pet { font-size: 17px; font-weight: 700; }
+    .res-pet   { font-size: 17px; font-weight: 700; }
     .res-breed { font-size: 12px; color: var(--brown); margin-top: 2px; }
 
     .status-badge {
       font-size: 11px; font-weight: 700;
-      padding: 4px 10px; border-radius: 20px;
-      white-space: nowrap;
+      padding: 4px 10px; border-radius: 20px; white-space: nowrap;
     }
     .status-pending     { background: #fff3e0; color: #e67e00; }
     .status-confirmed   { background: #e8f5e9; color: #2e7d32; }
@@ -134,107 +158,90 @@
     .status-checked_out { background: #f3e5f5; color: #6a1b9a; }
     .status-cancelled   { background: #f5f5f5; color: #757575; }
 
-    .res-info { font-size: 13px; color: var(--brown); line-height: 1.9; }
+    .res-info { font-size: 13px; color: var(--brown); line-height: 2; }
     .res-info strong { color: var(--text); }
 
-    .res-footer { margin-top: 14px; }
+    .res-footer { margin-top: 12px; }
     .btn-report {
       display: inline-flex; align-items: center; gap: 6px;
       background: var(--cream); color: var(--brown);
-      border: 1.5px solid var(--sand);
-      border-radius: 20px; padding: 7px 14px;
-      font-size: 12px; font-weight: 600;
+      border: 1.5px solid var(--sand); border-radius: 20px;
+      padding: 7px 14px; font-size: 12px; font-weight: 600;
       font-family: 'Pretendard', sans-serif;
       cursor: pointer; text-decoration: none;
       transition: background .2s;
     }
     .btn-report:hover { background: var(--sand); }
 
-    /* ── LOADING ── */
-    .loading {
-      text-align: center; padding: 40px;
-      color: var(--brown); font-size: 14px;
-    }
-
-    /* ── BACK BTN ── */
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      color: rgba(255,255,255,.7); font-size: 13px;
-      text-decoration: none; margin-bottom: 12px;
-      background: none; border: none; cursor: pointer;
-      font-family: 'Pretendard', sans-serif;
-    }
-    .back-btn:hover { color: #fff; }
+    .loading { text-align: center; padding: 40px; color: var(--brown); font-size: 14px; }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <a href="/" class="back-btn">← 홈으로</a>
+    <div><a href="/" class="back-btn">← 홈으로</a></div>
     <div class="header-logo">🐾 MaruStay</div>
     <div class="header-sub">내 예약 조회</div>
   </div>
 
   <div class="container">
 
-    <!-- 비로그인 상태 -->
+    <!-- 비로그인 -->
     <div id="loginRequired" class="login-required" style="display:none">
       <div class="icon">🔒</div>
       <h2>로그인이 필요해요</h2>
       <p>카카오 로그인 후 예약 내역을 확인할 수 있어요</p>
-      <a href="/" class="btn-kakao">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.477 3 2 6.686 2 11.25c0 2.917 1.74 5.484 4.38 7.01L5.25 22l5.047-2.668A11.3 11.3 0 0012 19.5c5.523 0 10-3.686 10-8.25S17.523 3 12 3z"/></svg>
-        홈에서 로그인하기
-      </a>
+      <a href="/" class="btn-home">홈에서 로그인하기</a>
     </div>
 
     <!-- 로그인 상태 -->
     <div id="loggedIn" style="display:none">
-      <div class="phone-section">
-        <div class="user-greeting">
-          <img class="user-avatar" id="userAvatar" src="" alt="프로필">
-          <div>
-            <div class="user-name"><span id="userName"></span>님, 안녕하세요! 👋</div>
-            <div style="font-size:12px;color:var(--brown);margin-top:2px;">예약 시 등록한 연락처로 조회해요</div>
-          </div>
+
+      <!-- 사용자 카드 -->
+      <div class="user-card">
+        <img class="user-avatar" id="userAvatar" src="" alt="프로필">
+        <div>
+          <div class="user-name" id="userName"></div>
+          <div class="user-phone" id="userPhone"></div>
         </div>
-        <div class="phone-form">
-          <label for="phoneInput">연락처 입력</label>
-          <div class="phone-row">
-            <input type="tel" id="phoneInput" placeholder="010-0000-0000" maxlength="13">
-            <button class="btn-search" onclick="searchReservations()">조회</button>
-          </div>
+        <button class="change-phone" id="changePhoneBtn" onclick="showPhoneForm()" style="display:none">연락처 변경</button>
+      </div>
+
+      <!-- 연락처 입력 폼 (처음 방문 or 변경 시) -->
+      <div class="phone-section" id="phoneSection" style="display:none">
+        <p>예약 시 등록한 연락처를 입력해주세요.<br>한 번 입력하면 다음엔 자동으로 조회돼요.</p>
+        <label for="phoneInput">연락처</label>
+        <div class="phone-row">
+          <input type="tel" id="phoneInput" placeholder="010-0000-0000" maxlength="13">
+          <button class="btn-search" onclick="saveAndSearch()">조회</button>
         </div>
       </div>
 
       <div id="results"></div>
-    </div>
 
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://sjzxpqtkpaehazwtonge.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqenhwcXRrcGFlaGF6d3RvbmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTYwMTMsImV4cCI6MjA5NTE5MjAxM30.M8CqLiIQeOSfoWh-rpQ-lkrnUEWhU9pS7v72vUZfxIs';
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const STATUS_LABEL = {
+    const STATUS = {
       pending:     { text: '확인 대기 중', cls: 'status-pending' },
       confirmed:   { text: '예약 확정',    cls: 'status-confirmed' },
       checked_in:  { text: '입실 중',      cls: 'status-checked_in' },
       checked_out: { text: '퇴실 완료',    cls: 'status-checked_out' },
       cancelled:   { text: '취소됨',       cls: 'status-cancelled' },
     };
-
-    const ROOM_LABEL = {
-      small:  '소형견룸',
-      medium: '중형견룸',
-      cat:    '애묘룸',
-      ocean:  '오션뷰 힐링룸',
+    const ROOM = {
+      small: '소형견룸', medium: '중형견룸', cat: '애묘룸', ocean: '오션뷰 힐링룸',
     };
 
-    // ── 초기화 ─────────────────────────────────────
+    let currentUser = null;
+
+    // ── 초기화 ──────────────────────────────────────────────
     (function init() {
       const stored = localStorage.getItem('marustay_user');
       if (!stored) {
@@ -242,61 +249,89 @@
         return;
       }
       try {
-        const user = JSON.parse(stored);
+        currentUser = JSON.parse(stored);
         document.getElementById('loggedIn').style.display = 'block';
-        document.getElementById('userAvatar').src = user.avatar || '';
-        document.getElementById('userName').textContent = user.nickname || '회원';
+        document.getElementById('userAvatar').src = currentUser.avatar || '';
+        document.getElementById('userName').textContent = currentUser.nickname + '님';
+
+        // 저장된 연락처가 있으면 자동 조회
+        const savedPhone = localStorage.getItem('marustay_phone');
+        if (savedPhone) {
+          document.getElementById('userPhone').textContent = savedPhone;
+          document.getElementById('changePhoneBtn').style.display = 'block';
+          searchReservations(savedPhone);
+        } else {
+          // 처음 방문 — 연락처 입력 폼 보여주기
+          document.getElementById('phoneSection').style.display = 'block';
+        }
       } catch (e) {
         document.getElementById('loginRequired').style.display = 'block';
       }
     })();
 
-    // ── 전화번호 포맷 ───────────────────────────────
+    // ── 전화번호 자동 포맷 ───────────────────────────────────
     document.getElementById('phoneInput').addEventListener('input', function() {
       let v = this.value.replace(/\D/g, '');
-      if (v.length <= 3) this.value = v;
-      else if (v.length <= 7) this.value = v.slice(0,3) + '-' + v.slice(3);
-      else this.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7,11);
+      if (v.length <= 3)       this.value = v;
+      else if (v.length <= 7)  this.value = v.slice(0,3) + '-' + v.slice(3);
+      else                     this.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7,11);
+    });
+    document.getElementById('phoneInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') saveAndSearch();
     });
 
-    document.getElementById('phoneInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') searchReservations();
-    });
-
-    // ── 예약 조회 ────────────────────────────────────
-    async function searchReservations() {
+    // ── 연락처 저장 후 조회 ──────────────────────────────────
+    function saveAndSearch() {
       const phone = document.getElementById('phoneInput').value.trim();
       if (!phone) { alert('연락처를 입력해주세요.'); return; }
+      localStorage.setItem('marustay_phone', phone);
+      document.getElementById('userPhone').textContent = phone;
+      document.getElementById('changePhoneBtn').style.display = 'block';
+      document.getElementById('phoneSection').style.display = 'none';
+      searchReservations(phone);
+    }
 
+    // ── 연락처 변경 ──────────────────────────────────────────
+    function showPhoneForm() {
+      const phoneSection = document.getElementById('phoneSection');
+      phoneSection.style.display = phoneSection.style.display === 'none' ? 'block' : 'none';
+      if (phoneSection.style.display === 'block') {
+        const saved = localStorage.getItem('marustay_phone') || '';
+        document.getElementById('phoneInput').value = saved;
+        document.getElementById('phoneInput').focus();
+      }
+    }
+
+    // ── 예약 조회 ────────────────────────────────────────────
+    async function searchReservations(phone) {
       const results = document.getElementById('results');
-      results.innerHTML = '<div class="loading">🔍 조회 중...</div>';
+      results.innerHTML = '<div class="loading">🔍 예약 내역 조회 중...</div>';
 
       const { data, error } = await db.rpc('get_my_reservations', { p_phone: phone });
 
       if (error) {
-        results.innerHTML = '<div class="empty"><div class="icon">⚠️</div>조회 중 오류가 발생했어요. 다시 시도해주세요.</div>';
-        console.error(error);
+        results.innerHTML = '<div class="empty"><div class="icon">⚠️</div>조회 중 오류가 발생했어요.</div>';
         return;
       }
-
       if (!data || data.length === 0) {
-        results.innerHTML = '<div class="empty"><div class="icon">📋</div>해당 연락처로 등록된 예약이 없어요.<br><br><a href="/#booking" style="color:var(--accent);font-weight:600;">예약 신청하러 가기 →</a></div>';
+        results.innerHTML = `<div class="empty">
+          <div class="icon">📋</div>
+          해당 연락처로 등록된 예약이 없어요.<br><br>
+          <a href="/#booking" style="color:var(--accent);font-weight:600;">예약 신청하러 가기 →</a>
+        </div>`;
         return;
       }
 
-      results.innerHTML = data.map(r => renderCard(r)).join('');
+      results.innerHTML = '<div class="section-title">예약 내역 ' + data.length + '건</div>'
+        + data.map(renderCard).join('');
     }
 
-    // ── 카드 렌더링 ──────────────────────────────────
+    // ── 카드 렌더링 ──────────────────────────────────────────
     function renderCard(r) {
-      const st = STATUS_LABEL[r.status] || { text: r.status, cls: 'status-pending' };
-      const room = ROOM_LABEL[r.room_type] || r.room_type || '미정';
-      const checkin  = r.checkin_date  ? new Date(r.checkin_date).toLocaleDateString('ko-KR',  { month:'long', day:'numeric', weekday:'short' }) : '-';
-      const checkout = r.checkout_date ? new Date(r.checkout_date).toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'short' }) : '-';
-
-      const isCheckedIn  = r.status === 'checked_in';
-      const isCheckedOut = r.status === 'checked_out';
-      const showReport   = isCheckedIn || isCheckedOut;
+      const st     = STATUS[r.status] || { text: r.status, cls: 'status-pending' };
+      const room   = ROOM[r.room_type] || r.room_type || '미정';
+      const fmt    = d => d ? new Date(d).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' }) : '-';
+      const report = (r.status === 'checked_in' || r.status === 'checked_out');
 
       return `
         <div class="res-card ${r.status}">
@@ -308,15 +343,12 @@
             <span class="status-badge ${st.cls}">${st.text}</span>
           </div>
           <div class="res-info">
-            <div>📅 <strong>체크인</strong>  ${checkin}</div>
-            <div>📅 <strong>체크아웃</strong> ${checkout}</div>
-            <div>🏠 <strong>객실</strong>     ${room}</div>
+            <div>📅 <strong>체크인</strong>&nbsp; ${fmt(r.checkin_date)}</div>
+            <div>📅 <strong>체크아웃</strong> ${fmt(r.checkout_date)}</div>
+            <div>🏠 <strong>객실</strong>&nbsp;&nbsp;&nbsp; ${room}</div>
           </div>
-          ${showReport ? `
-          <div class="res-footer">
-            <a class="btn-report" href="report.html?rid=${r.id}">
-              📋 AI 알림장 보기
-            </a>
+          ${report ? `<div class="res-footer">
+            <a class="btn-report" href="report.html?rid=${r.id}">📋 AI 알림장 보기</a>
           </div>` : ''}
         </div>`;
     }
