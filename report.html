@@ -3,324 +3,173 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MaruStay 알림장</title>
-  <meta name="robots" content="noindex">
-  <meta property="og:title" content="MaruStay 알림장">
-  <meta property="og:description" content="소중한 아이의 오늘 하루를 전해드립니다 🐾">
-  <meta property="og:image" content="https://maru-stay.vercel.app/og-report.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>AI 알림장 — MaruStay</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
   <style>
     :root {
-      --brown-dk: #4a3728;
-      --brown:    #6b4e37;
-      --accent:   #d4956a;
-      --cream:    #fdf6ee;
-      --sand:     #e8d5bc;
-      --bg:       #fff8f2;
+      --brown-dk: #3d1e08;
+      --brown:    #7a4520;
+      --accent:   #c87c3a;
+      --cream:    #fff8ec;
+      --sand:     #f5e8d2;
+      --text:     #3a2010;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: var(--bg);
-      color: #3d2b1f;
+      font-family: 'Pretendard', sans-serif;
+      background: #fff8f2;
+      color: var(--text);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
+    .container { max-width: 520px; margin: 0 auto; padding: 0 16px 60px; }
 
-    .container { max-width: 480px; margin: 0 auto; }
-
-    /* ── HEADER ─────────────────────────────── */
+    /* HEADER */
     .header {
-      background: linear-gradient(145deg, var(--brown-dk) 0%, #7a5840 100%);
-      padding: 30px 20px 36px;
+      background: linear-gradient(145deg, var(--brown-dk) 0%, #7a4520 100%);
+      padding: 24px 20px 28px;
       text-align: center;
       color: #fff;
     }
-    .header-paw { font-size: 34px; margin-bottom: 8px; }
-    .header h1  { font-size: 19px; font-weight: 700; letter-spacing: .06em; }
-    .header p   { font-size: 12px; opacity: .65; margin-top: 5px; letter-spacing: .02em; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      color: rgba(255,255,255,.65); font-size: 13px;
+      text-decoration: none; margin-bottom: 10px;
+      background: none; border: none; cursor: pointer;
+      font-family: 'Pretendard', sans-serif;
+    }
+    .back-btn:hover { color: #fff; }
+    .header-pet   { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .header-sub   { font-size: 13px; opacity: .65; }
 
-    /* ── PET CARD ──────────────────────────── */
-    .pet-card {
-      margin: -18px 16px 0;
-      background: #fff;
-      border-radius: 20px;
-      padding: 22px 20px 18px;
-      box-shadow: 0 6px 24px rgba(74,55,40,.13);
-      text-align: center;
+    /* EMPTY / LOADING */
+    .state-box {
+      text-align: center; padding: 60px 20px;
+      color: var(--brown); font-size: 14px; line-height: 1.8;
     }
-    .pet-avatar {
-      width: 72px; height: 72px;
-      background: var(--cream);
-      border-radius: 50%;
-      margin: 0 auto 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 38px;
-      border: 3px solid var(--sand);
-    }
-    .pet-name  { font-size: 22px; font-weight: 700; color: var(--brown-dk); }
-    .pet-breed { font-size: 13px; color: #bbb; margin-top: 4px; }
-    .pet-stay  {
-      display: inline-flex; align-items: center; gap: 5px;
-      margin-top: 12px;
-      background: var(--cream);
-      border-radius: 20px; padding: 6px 14px;
-      font-size: 12px; color: var(--brown); font-weight: 600;
-    }
+    .state-box .icon { font-size: 44px; margin-bottom: 14px; }
 
-    /* ── SECTION ────────────────────────────── */
-    .section { padding: 24px 16px 0; }
-    .section-title {
-      font-size: 11px; font-weight: 700;
-      color: #c0a898; letter-spacing: .08em; text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-
-    /* ── REPORT CARD ─────────────────────────── */
+    /* REPORT CARD */
     .report-card {
       background: #fff;
-      border-radius: 18px;
-      padding: 18px 18px 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 14px rgba(74,55,40,.07);
-      border-left: 4px solid var(--accent);
-      animation: fadeUp .3s ease both;
+      border-radius: 20px;
+      padding: 22px 22px 20px;
+      margin-top: 18px;
+      box-shadow: 0 3px 20px rgba(140,80,20,.09);
+      position: relative;
+      overflow: hidden;
     }
-    @keyframes fadeUp {
-      from { opacity:0; transform:translateY(8px); }
-      to   { opacity:1; transform:translateY(0); }
+    .report-card::before {
+      content: '🐾';
+      position: absolute; top: -6px; right: 14px;
+      font-size: 52px; opacity: .06;
     }
+
     .report-date {
-      font-size: 12px; font-weight: 700;
-      color: var(--accent); margin-bottom: 10px; letter-spacing: .02em;
+      font-size: 13px; font-weight: 700;
+      color: var(--accent); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 6px;
     }
+    .report-date::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--sand);
+    }
+
+    /* 이모지 지표 뱃지 */
     .badges {
-      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+      display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px;
     }
     .badge {
-      font-size: 11px; padding: 4px 10px;
-      border-radius: 20px; background: var(--cream);
-      color: var(--brown); font-weight: 600;
-    }
-    .report-text {
-      font-size: 14.5px; line-height: 1.9;
-      color: #4a3728; word-break: keep-all;
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--cream); border-radius: 20px;
+      padding: 5px 11px; font-size: 12px; font-weight: 600;
+      color: var(--brown);
     }
 
-    /* ── EMPTY STATE ────────────────────────── */
-    .empty {
-      text-align: center; padding: 40px 20px 30px;
-      color: #d0bfb4;
+    /* 본문 */
+    .report-content {
+      font-size: 14px; line-height: 1.85;
+      color: var(--text); white-space: pre-wrap;
     }
-    .empty-icon { font-size: 42px; margin-bottom: 10px; }
-    .empty p    { font-size: 14px; line-height: 1.7; }
-
-    /* ── LOADING ─────────────────────────────── */
-    .loading-view {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      min-height: 100vh; gap: 14px; color: #c9b0a0;
-    }
-    .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid var(--sand);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .75s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-view p { font-size: 14px; }
-
-    /* ── ERROR ───────────────────────────────── */
-    .error-view {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      min-height: 100vh; gap: 10px;
-      padding: 20px; text-align: center;
-    }
-    .error-icon  { font-size: 50px; }
-    .error-title { font-size: 18px; font-weight: 700; color: var(--brown-dk); }
-    .error-msg   { font-size: 14px; color: #bbb; }
-
-    /* ── FOOTER ──────────────────────────────── */
-    .footer {
-      text-align: center; padding: 32px 20px 40px;
-      font-size: 12px; color: #d0bfb4;
-    }
-    .footer strong { color: var(--accent); }
   </style>
 </head>
 <body>
 
-  <!-- 로딩 -->
-  <div id="loadingView" class="loading-view">
-    <div class="spinner"></div>
-    <p>알림장을 불러오고 있어요...</p>
+  <div class="header">
+    <div><a href="javascript:history.back()" class="back-btn">← 뒤로</a></div>
+    <div class="header-pet" id="headerPet">🐾 알림장</div>
+    <div class="header-sub">마루스테이에서 보내는 하루 소식</div>
   </div>
 
-  <!-- 오류 -->
-  <div id="errorView" class="error-view" style="display:none">
-    <div class="error-icon">🐾</div>
-    <div class="error-title" id="errTitle">알림장을 찾을 수 없어요</div>
-    <div class="error-msg"   id="errMsg">링크가 올바른지 확인해 주세요</div>
-  </div>
-
-  <!-- 본문 -->
-  <div id="contentView" style="display:none">
-    <div class="container">
-
-      <div class="header">
-        <div class="header-paw">🐾</div>
-        <h1>MaruStay 알림장</h1>
-        <p>소중한 아이의 하루를 보호자님께 전해드립니다</p>
-      </div>
-
-      <div class="pet-card">
-        <div class="pet-avatar" id="petAvatar">🐶</div>
-        <div class="pet-name"  id="petName">-</div>
-        <div class="pet-breed" id="petBreed"></div>
-        <div class="pet-stay">
-          <span>📅</span>
-          <span id="stayDates">-</span>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">📋 일일 알림장</div>
-        <div id="reportList"></div>
-      </div>
-
-      <div class="footer">
-        <strong>MaruStay</strong>에서 사랑을 담아 보내드립니다 🐾
-      </div>
-
+  <div class="container">
+    <div id="content">
+      <div class="state-box"><div class="icon">⏳</div>불러오는 중...</div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    /* ──────────────── Supabase ──────────────── */
     const SUPABASE_URL = 'https://sjzxpqtkpaehazwtonge.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqenhwcXRrcGFlaGF6d3RvbmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTYwMTMsImV4cCI6MjA5NTE5MjAxM30.M8CqLiIQeOSfoWh-rpQ-lkrnUEWhU9pS7v72vUZfxIs';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    /* ──────────────── 상수 맵 ──────────────── */
-    const MOOD_MAP = {
-      great:   '😊 매우 좋음',
-      good:    '🙂 좋음',
-      neutral: '😐 보통',
-      tired:   '😴 피곤',
-      anxious: '😟 긴장',
-    };
-    const ACTIVITY_MAP = {
-      low:    '🌙 차분함',
-      normal: '🐾 적당히 활발',
-      high:   '⚡ 매우 활발',
-    };
+    const params  = new URLSearchParams(location.search);
+    const rid     = params.get('rid');
+    const petName = params.get('pname') || '우리 아이';
 
-    /* ──────────────── 헬퍼 ─────────────────── */
-    function fmtDate(dt) {
-      if (!dt) return '';
-      const d = new Date(dt + 'T00:00:00');
-      return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`;
-    }
-    function pad(n) { return String(n).padStart(2, '0'); }
+    document.getElementById('headerPet').textContent = `🐾 ${petName}의 알림장`;
+    document.title = `${petName}의 알림장 — MaruStay`;
 
-    function esc(s) {
-      if (!s) return '';
-      return String(s)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-        .replace(/\n/g,'<br>');
-    }
+    const MEAL_LABEL = { great:'밥 아주 잘 먹음', good:'밥 잘 먹음', little:'밥 조금 먹음', none:'밥 잘 안 먹음' };
+    const COND_LABEL = { great:'컨디션 최고 🎉', good:'컨디션 좋음', normal:'컨디션 보통', anxious:'예민함 🤍' };
+    const WALK_LABEL = { great:'산책 신나게 🐕', short:'산책 짧게', none:'실내 휴식' };
+    const SLEP_LABEL = { great:'잠 푹 잠 😴', good:'잠 잘 잠 😴', poor:'잠 설침' };
+    const SOCI_LABEL = { friendly:'친구들과 잘 어울림 🐾', normal:'편안히 지냄', shy:'조용히 지냄' };
 
-    function showError(title = '알림장을 찾을 수 없어요', msg = '링크가 올바른지 확인해 주세요') {
-      document.getElementById('loadingView').style.display = 'none';
-      document.getElementById('errTitle').textContent = title;
-      document.getElementById('errMsg').textContent   = msg;
-      document.getElementById('errorView').style.display = 'flex';
-    }
-
-    /* ──────────────── 렌더링 ─────────────────── */
-    function renderReport(data) {
-      if (!data || !data.pet) { showError(); return; }
-      const { pet, reports } = data;
-
-      /* 반려동물 카드 */
-      const isCAT = (pet.pet_breed || '').includes('고양이') ||
-                    window._petType === '고양이';
-      document.getElementById('petAvatar').textContent = isCAT ? '🐱' : '🐶';
-      document.getElementById('petName').textContent   = pet.pet_name || '-';
-
-      const breedParts = [pet.pet_breed, pet.pet_gender].filter(Boolean);
-      const breedEl = document.getElementById('petBreed');
-      breedEl.textContent = breedParts.join(' · ');
-      breedEl.style.display = breedParts.length ? '' : 'none';
-
-      document.getElementById('stayDates').textContent =
-        `${fmtDate(pet.checkin_date)} ~ ${fmtDate(pet.checkout_date)}`;
-
-      document.title = `${pet.pet_name}의 MaruStay 알림장`;
-
-      /* 알림장 목록 */
-      const listEl = document.getElementById('reportList');
-      if (!reports || !reports.length) {
-        listEl.innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">📝</div>
-            <p>아직 작성된 알림장이 없어요.<br>곧 따뜻한 소식을 전해드릴게요!</p>
-          </div>`;
-      } else {
-        /* 최신 날짜가 위 */
-        const sorted = [...reports].sort((a, b) =>
-          b.report_date.localeCompare(a.report_date));
-
-        listEl.innerHTML = sorted.map((r, i) => `
-          <div class="report-card" style="animation-delay:${i * 60}ms">
-            <div class="report-date">📅 ${fmtDate(r.report_date)}</div>
-            <div class="badges">
-              ${r.mood          ? `<span class="badge">${MOOD_MAP[r.mood] || r.mood}</span>` : ''}
-              ${r.activity_level? `<span class="badge">${ACTIVITY_MAP[r.activity_level] || r.activity_level}</span>` : ''}
-              ${r.bathroom_count != null ? `<span class="badge">🚾 배변 ${r.bathroom_count}회</span>` : ''}
-            </div>
-            <div class="report-text">${esc(r.report_content || '내용이 없어요.')}</div>
-          </div>
-        `).join('');
-      }
-
-      /* 화면 전환 */
-      document.getElementById('loadingView').style.display  = 'none';
-      document.getElementById('contentView').style.display  = 'block';
-    }
-
-    /* ──────────────── 데이터 로드 ─────────────── */
-    async function loadReport() {
-      const params = new URLSearchParams(window.location.search);
-      const rid = params.get('rid');
-
+    (async function load() {
       if (!rid) {
-        showError('잘못된 링크예요', '알림장 링크에 예약 ID가 없어요');
+        document.getElementById('content').innerHTML =
+          '<div class="state-box"><div class="icon">⚠️</div>잘못된 접근이에요.</div>';
         return;
       }
 
-      const { data, error } = await db.rpc('get_pet_reports', {
-        p_reservation_id: rid,
-      });
+      const { data, error } = await db.rpc('get_reports_by_reservation', { p_reservation_id: rid });
 
       if (error) {
-        showError('불러오기 실패', error.message);
-        return;
-      }
-      if (!data) {
-        showError('예약 정보를 찾을 수 없어요', '링크가 만료되었거나 잘못된 링크예요');
+        document.getElementById('content').innerHTML =
+          '<div class="state-box"><div class="icon">⚠️</div>불러오는 중 오류가 발생했어요.<br><small>' + error.message + '</small></div>';
         return;
       }
 
-      renderReport(data);
+      if (!data || data.length === 0) {
+        document.getElementById('content').innerHTML =
+          '<div class="state-box"><div class="icon">📋</div>아직 작성된 알림장이 없어요.<br>입실 후 선생님들이 작성해드릴게요 🐾</div>';
+        return;
+      }
+
+      document.getElementById('content').innerHTML = data.map(r => {
+        const d    = new Date(r.report_date);
+        const dateStr = d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' });
+        const badges = [
+          r.meal_amount  ? `<span class="badge">🍚 ${MEAL_LABEL[r.meal_amount] || r.meal_amount}</span>` : '',
+          r.condition    ? `<span class="badge">💛 ${COND_LABEL[r.condition]   || r.condition}</span>`   : '',
+          r.walk         ? `<span class="badge">🌿 ${WALK_LABEL[r.walk]        || r.walk}</span>`        : '',
+          r.sleep_quality? `<span class="badge">🌙 ${SLEP_LABEL[r.sleep_quality]||r.sleep_quality}</span>`:'',
+          r.social       ? `<span class="badge">🐾 ${SOCI_LABEL[r.social]      || r.social}</span>`     : '',
+        ].filter(Boolean).join('');
+
+        return `
+          <div class="report-card">
+            <div class="report-date">📅 ${dateStr}</div>
+            <div class="badges">${badges}</div>
+            <div class="report-content">${esc(r.content || '')}</div>
+          </div>`;
+      }).join('');
+    })();
+
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
-
-    loadReport();
   </script>
 </body>
 </html>

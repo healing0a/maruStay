@@ -495,7 +495,19 @@
       <div class="memo-row">
         <textarea id="memo-${r.id}" placeholder="내부 메모를 입력하세요...">${esc(r.admin_memo || '')}</textarea>
         <button class="btn-save-memo" onclick="saveMemo('${r.id}')">저장</button>
-      </div>`;
+      </div>
+      ${(r.status === 'checked_in' || r.status === 'checked_out') ? `
+      <div style="margin-top:14px">
+        <a href="admin-report.html?rid=${r.id}&pname=${encodeURIComponent(r.pet_name || '반려동물')}"
+           onclick="event.stopPropagation()"
+           style="display:inline-flex;align-items:center;gap:6px;background:#fff3e0;color:#e67e00;
+                  border:1.5px solid #ffe0b2;border-radius:20px;padding:8px 16px;
+                  font-size:13px;font-weight:700;text-decoration:none;transition:background .15s;"
+           onmouseover="this.style.background='#ffe0b2'" onmouseout="this.style.background='#fff3e0'">
+          📋 AI 알림장 관리
+        </a>
+      </div>` : ''}
+`;
   }
 
   function toggleDetail(id) {

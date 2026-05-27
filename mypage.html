@@ -263,7 +263,7 @@
             <div>🏠 <strong>객실</strong>&nbsp;&nbsp;&nbsp; ${room}</div>
           </div>
           ${canReport ? `<div class="res-footer">
-            <a class="btn-report" href="report.html?rid=${r.id}">📋 AI 알림장 보기</a>
+            <a class="btn-report" href="report.html?rid=${r.id}&pname=${encodeURIComponent(r.pet_name || '')}">📋 AI 알림장 보기</a>
           </div>` : ''}
         </div>`;
     }

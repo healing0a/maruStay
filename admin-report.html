@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>알림장 관리 — MaruStay 관리자</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+  <style>
+    :root {
+      --brown-dk: #3d1e08;
+      --brown:    #7a4520;
+      --accent:   #c87c3a;
+      --cream:    #fff8ec;
+      --sand:     #f5e8d2;
+      --text:     #3a2010;
+      --green:    #5aaa50;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background: #f5f0eb;
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* HEADER */
+    .admin-header {
+      background: var(--brown-dk); color: #fff;
+      padding: 14px 24px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,.2);
+    }
+    .admin-header h1 { font-size: 16px; font-weight: 800; }
+    .admin-header span { font-size: 12px; opacity: .6; display:block; margin-top:2px; }
+    .btn-back {
+      background: rgba(255,255,255,.12); color: #fff;
+      border: 1px solid rgba(255,255,255,.2); border-radius: 20px;
+      padding: 6px 14px; font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: 'Pretendard', sans-serif;
+      text-decoration: none; transition: background .2s;
+    }
+    .btn-back:hover { background: rgba(255,255,255,.22); }
+
+    .container { max-width: 680px; margin: 0 auto; padding: 20px 16px 60px; }
+
+    /* SECTION TITLE */
+    .sec-title {
+      font-size: 14px; font-weight: 800; color: var(--brown);
+      margin: 24px 0 12px; display: flex; align-items: center; gap: 6px;
+    }
+
+    /* PAST REPORTS */
+    .past-card {
+      background: #fff; border-radius: 16px; padding: 16px 18px;
+      margin-bottom: 10px; box-shadow: 0 2px 12px rgba(140,80,20,.07);
+      cursor: pointer; transition: background .15s;
+    }
+    .past-card:hover { background: #fdf8f2; }
+    .past-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .past-date  { font-size: 14px; font-weight: 700; }
+    .past-badge { font-size: 11px; color: var(--brown); }
+    .past-preview {
+      font-size: 12px; color: var(--brown); margin-top: 6px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .past-body { display: none; margin-top: 12px; }
+    .past-body.open { display: block; }
+    .past-body-text {
+      font-size: 13px; line-height: 1.8; white-space: pre-wrap;
+      background: var(--cream); border-radius: 10px; padding: 12px 14px;
+    }
+
+    /* FORM CARD */
+    .form-card {
+      background: #fff; border-radius: 20px; padding: 22px 22px;
+      box-shadow: 0 3px 20px rgba(140,80,20,.09);
+    }
+
+    .form-row { margin-bottom: 18px; }
+    .form-label {
+      font-size: 13px; font-weight: 700; color: var(--brown);
+      margin-bottom: 8px; display: block;
+    }
+
+    /* Date input */
+    input[type=date] {
+      padding: 10px 14px; font-size: 14px;
+      border: 1.5px solid var(--sand); border-radius: 10px;
+      font-family: 'Pretendard', sans-serif; outline: none;
+      background: var(--cream); width: 100%; max-width: 200px;
+    }
+    input[type=date]:focus { border-color: var(--accent); }
+
+    /* Radio pills */
+    .pill-group { display: flex; flex-wrap: wrap; gap: 7px; }
+    .pill-group input[type=radio] { display: none; }
+    .pill-group label {
+      padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      background: var(--cream); color: var(--brown);
+      border: 1.5px solid var(--sand); cursor: pointer;
+      transition: all .15s; user-select: none;
+    }
+    .pill-group input[type=radio]:checked + label {
+      background: var(--brown-dk); color: #fff; border-color: var(--brown-dk);
+    }
+
+    /* Auto-generate button */
+    .btn-generate {
+      width: 100%; padding: 12px; font-size: 14px; font-weight: 700;
+      background: linear-gradient(135deg, #c87c3a, #7a4520);
+      color: #fff; border: none; border-radius: 12px; cursor: pointer;
+      font-family: 'Pretendard', sans-serif; transition: opacity .2s;
+      margin-bottom: 14px;
+    }
+    .btn-generate:hover { opacity: .88; }
+
+    /* Textarea */
+    textarea {
+      width: 100%; min-height: 180px; padding: 14px;
+      font-size: 13px; line-height: 1.8;
+      border: 1.5px solid var(--sand); border-radius: 12px; resize: vertical;
+      font-family: 'Pretendard', sans-serif; outline: none;
+      background: var(--cream);
+    }
+    textarea:focus { border-color: var(--accent); }
+
+    /* Save button */
+    .btn-save {
+      width: 100%; padding: 14px; font-size: 15px; font-weight: 800;
+      background: var(--green); color: #fff; border: none;
+      border-radius: 12px; cursor: pointer;
+      font-family: 'Pretendard', sans-serif; transition: opacity .2s;
+      margin-top: 14px;
+    }
+    .btn-save:hover { opacity: .88; }
+    .btn-save:disabled { opacity: .5; cursor: default; }
+
+    /* Preview link */
+    .preview-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      color: var(--accent); font-size: 13px; font-weight: 600;
+      text-decoration: none; margin-top: 14px;
+    }
+    .preview-link:hover { text-decoration: underline; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: #3d1e08; color: #fff; padding: 12px 24px; border-radius: 50px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.25); font-size: 14px; font-weight: 600;
+      z-index: 9999; white-space: nowrap; animation: fadeUp .3s ease; pointer-events: none;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateX(-50%) translateY(10px); }
+      to   { opacity:1; transform:translateX(-50%) translateY(0); }
+    }
+
+    .loading { text-align: center; padding: 30px; color: var(--brown); font-size: 14px; }
+    .empty   { text-align: center; padding: 30px; color: var(--brown); font-size: 13px; opacity: .7; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-header">
+    <div>
+      <h1 id="headerTitle">📋 알림장 관리</h1>
+      <span id="headerSub">로딩 중...</span>
+    </div>
+    <a href="admin.html" class="btn-back">← 관리자</a>
+  </div>
+
+  <div class="container">
+
+    <!-- 과거 알림장 -->
+    <div class="sec-title">📚 작성된 알림장</div>
+    <div id="pastList"><div class="loading">⏳ 불러오는 중...</div></div>
+
+    <!-- 새 알림장 작성 -->
+    <div class="sec-title">✏️ 새 알림장 작성</div>
+    <div class="form-card">
+
+      <div class="form-row">
+        <label class="form-label">📅 날짜</label>
+        <input type="date" id="reportDate">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">🍚 식사량</label>
+        <div class="pill-group">
+          <input type="radio" name="meal" id="m-great"  value="great"> <label for="m-great">아주 잘 먹음</label>
+          <input type="radio" name="meal" id="m-good"   value="good" checked> <label for="m-good">잘 먹음</label>
+          <input type="radio" name="meal" id="m-little" value="little"> <label for="m-little">조금 먹음</label>
+          <input type="radio" name="meal" id="m-none"   value="none"> <label for="m-none">잘 안 먹음</label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">💛 컨디션</label>
+        <div class="pill-group">
+          <input type="radio" name="cond" id="c-great"   value="great">   <label for="c-great">최고 🎉</label>
+          <input type="radio" name="cond" id="c-good"    value="good" checked> <label for="c-good">좋음</label>
+          <input type="radio" name="cond" id="c-normal"  value="normal">  <label for="c-normal">보통</label>
+          <input type="radio" name="cond" id="c-anxious" value="anxious"> <label for="c-anxious">예민함</label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">🌿 산책</label>
+        <div class="pill-group">
+          <input type="radio" name="walk" id="w-great" value="great"> <label for="w-great">신나게 🐕</label>
+          <input type="radio" name="walk" id="w-short" value="short" checked> <label for="w-short">짧게</label>
+          <input type="radio" name="walk" id="w-none"  value="none">  <label for="w-none">실내 휴식</label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">🌙 수면</label>
+        <div class="pill-group">
+          <input type="radio" name="sleep" id="s-great" value="great"> <label for="s-great">푹 잠 😴</label>
+          <input type="radio" name="sleep" id="s-good"  value="good" checked> <label for="s-good">잘 잠</label>
+          <input type="radio" name="sleep" id="s-poor"  value="poor">  <label for="s-poor">설침</label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">🐾 사회성</label>
+        <div class="pill-group">
+          <input type="radio" name="social" id="so-friendly" value="friendly"> <label for="so-friendly">친구들과 잘 어울림</label>
+          <input type="radio" name="social" id="so-normal"   value="normal" checked> <label for="so-normal">편안히 지냄</label>
+          <input type="radio" name="social" id="so-shy"      value="shy">      <label for="so-shy">조용히 지냄</label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">📌 특이사항 <span style="font-weight:400;opacity:.6">(선택)</span></label>
+        <textarea id="specialNotes" rows="2" style="min-height:70px" placeholder="특이사항이 있으면 입력하세요 (약 복용, 건강 이상 등)"></textarea>
+      </div>
+
+      <button class="btn-generate" onclick="generateContent()">✨ 알림장 자동 생성</button>
+
+      <div class="form-row">
+        <label class="form-label">📝 알림장 내용 <span style="font-weight:400;opacity:.6">(수정 가능)</span></label>
+        <textarea id="reportContent" placeholder="자동 생성 버튼을 누르거나 직접 작성해주세요"></textarea>
+      </div>
+
+      <button class="btn-save" id="saveBtn" onclick="saveReport()">저장하기</button>
+
+      <div style="margin-top:14px">
+        <a id="previewLink" href="#" target="_blank" class="preview-link">👁 손님 미리보기 →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://sjzxpqtkpaehazwtonge.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqenhwcXRrcGFlaGF6d3RvbmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTYwMTMsImV4cCI6MjA5NTE5MjAxM30.M8CqLiIQeOSfoWh-rpQ-lkrnUEWhU9pS7v72vUZfxIs';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const params  = new URLSearchParams(location.search);
+    const rid     = params.get('rid');
+    const petName = params.get('pname') || '반려동물';
+    const adminPw = sessionStorage.getItem('marustay_admin_pw');
+
+    // auth check
+    if (!adminPw) {
+      alert('관리자 로그인이 필요합니다.');
+      location.href = 'admin.html';
+    }
+
+    // init
+    document.getElementById('headerTitle').textContent = `📋 ${petName} 알림장`;
+    document.getElementById('headerSub').textContent   = `예약 ID: ${rid ? rid.slice(0,8) + '...' : '-'}`;
+    document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('previewLink').href = `report.html?rid=${rid}&pname=${encodeURIComponent(petName)}`;
+
+    // ── 기존 알림장 로드 ──────────────────────────────────────
+    (async function loadPast() {
+      const { data, error } = await db.rpc('admin_get_reports', {
+        p_password: adminPw, p_reservation_id: rid
+      });
+      const el = document.getElementById('pastList');
+      if (error || !data) {
+        el.innerHTML = '<div class="empty">조회 오류 또는 없음</div>'; return;
+      }
+      if (data.length === 0) {
+        el.innerHTML = '<div class="empty">아직 작성된 알림장이 없어요</div>'; return;
+      }
+      el.innerHTML = data.map((r, i) => {
+        const d = new Date(r.report_date);
+        const dateStr = d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
+        return `
+          <div class="past-card" onclick="togglePast(${i})">
+            <div class="past-card-header">
+              <div class="past-date">${dateStr}</div>
+              <div class="past-badge" id="pastArrow${i}">▼</div>
+            </div>
+            <div class="past-preview" id="pastPrev${i}">${esc(r.content || '').substring(0, 60)}...</div>
+            <div class="past-body" id="pastBody${i}">
+              <div class="past-body-text">${esc(r.content || '')}</div>
+              <button style="margin-top:10px;padding:7px 16px;background:var(--cream);border:1.5px solid var(--sand);
+                border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:Pretendard,sans-serif;"
+                onclick="loadIntoForm(event, ${JSON.stringify(r).replace(/"/g,'&quot;')})">
+                ✏️ 이 알림장 수정
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    })();
+
+    function togglePast(i) {
+      const body  = document.getElementById('pastBody' + i);
+      const arrow = document.getElementById('pastArrow' + i);
+      const isOpen = body.classList.contains('open');
+      document.querySelectorAll('.past-body.open').forEach(b => b.classList.remove('open'));
+      document.querySelectorAll('.past-badge').forEach(a => a.textContent = '▼');
+      if (!isOpen) { body.classList.add('open'); arrow.textContent = '▲'; }
+    }
+
+    function loadIntoForm(e, r) {
+      e.stopPropagation();
+      document.getElementById('reportDate').value = r.report_date;
+      setRadio('meal',  r.meal_amount);
+      setRadio('cond',  r.condition);
+      setRadio('walk',  r.walk);
+      setRadio('sleep', r.sleep_quality);
+      setRadio('social',r.social);
+      document.getElementById('specialNotes').value  = r.special_notes || '';
+      document.getElementById('reportContent').value = r.content || '';
+      document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth' });
+      showToast('📝 수정 모드로 불러왔어요');
+    }
+
+    function setRadio(name, value) {
+      const el = document.querySelector(`input[name="${name}"][value="${value}"]`);
+      if (el) el.checked = true;
+    }
+
+    // ── 자동 생성 ────────────────────────────────────────────
+    function generateContent() {
+      const meal  = document.querySelector('input[name="meal"]:checked')?.value  || 'good';
+      const cond  = document.querySelector('input[name="cond"]:checked')?.value  || 'good';
+      const walk  = document.querySelector('input[name="walk"]:checked')?.value  || 'short';
+      const sleep = document.querySelector('input[name="sleep"]:checked')?.value || 'good';
+      const soci  = document.querySelector('input[name="social"]:checked')?.value|| 'normal';
+      const notes = document.getElementById('specialNotes').value.trim();
+
+      const meals = {
+        great:  `오늘 ${petName}는 밥을 정말 맛있게 잘 먹었어요 😋`,
+        good:   `오늘 ${petName}는 밥을 잘 먹었어요 🍚`,
+        little: `오늘 ${petName}는 밥을 조금 먹었어요`,
+        none:   `오늘 ${petName}는 밥을 잘 먹지 않았는데, 물은 잘 마셨어요`
+      };
+      const conds = {
+        great:   `활발하고 신나게 뛰어놀며 컨디션이 최고예요 🎉`,
+        good:    `컨디션이 좋고 활발하게 지냈어요`,
+        normal:  `평온하고 안정적으로 잘 지내고 있어요`,
+        anxious: `조금 예민한 모습도 있었지만, 선생님들이 옆에서 잘 챙겨줬어요 🤍`
+      };
+      const walks = {
+        great: `산책도 신나게 다녀왔는데, 꼬리가 쉬지 않고 흔들렸답니다 🐕`,
+        short: `짧게 바깥 바람도 쐬고 왔어요`,
+        none:  `오늘은 실내에서 편안하게 쉬었어요`
+      };
+      const sleeps = {
+        great: `밤에는 새근새근 푹 자며 에너지를 충전했어요 😴`,
+        good:  `잠도 잘 자고 있어요 😴`,
+        poor:  `잠을 조금 설치는 것 같아요. 낯선 환경에 적응 중이니 걱정 마세요!`
+      };
+      const socis = {
+        friendly: `다른 친구들과도 잘 어울리는 인기쟁이예요 🐾`,
+        normal:   `선생님들과 편안하게 잘 지내고 있어요`,
+        shy:      `조용히 자기만의 공간에서 차분하게 지냈어요`
+      };
+
+      let text = `안녕하세요! 오늘 ${petName}의 하루 소식을 전해드려요 🐾\n\n`;
+      text += [meals[meal], conds[cond], walks[walk], sleeps[sleep], socis[soci]]
+        .filter(Boolean).join('. ') + '.';
+      if (notes) text += `\n\n📌 특이사항: ${notes}`;
+      text += `\n\n보고 싶으시죠? 마루스테이에서 건강하고 행복하게 잘 지내고 있으니 안심하세요! 곧 만나요 💛`;
+
+      document.getElementById('reportContent').value = text;
+      showToast('✨ 알림장이 생성됐어요! 자유롭게 수정하세요');
+    }
+
+    // ── 저장 ────────────────────────────────────────────────
+    async function saveReport() {
+      const content = document.getElementById('reportContent').value.trim();
+      if (!content) { showToast('⚠ 내용을 입력하거나 자동 생성해주세요'); return; }
+
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ 저장 중...';
+
+      const { error } = await db.rpc('admin_upsert_report', {
+        p_password:       adminPw,
+        p_reservation_id: rid,
+        p_report_date:    document.getElementById('reportDate').value,
+        p_meal_amount:    document.querySelector('input[name="meal"]:checked')?.value  || 'good',
+        p_condition:      document.querySelector('input[name="cond"]:checked')?.value  || 'good',
+        p_walk:           document.querySelector('input[name="walk"]:checked')?.value  || 'short',
+        p_sleep_quality:  document.querySelector('input[name="sleep"]:checked')?.value || 'good',
+        p_social:         document.querySelector('input[name="social"]:checked')?.value|| 'normal',
+        p_special_notes:  document.getElementById('specialNotes').value.trim(),
+        p_content:        content,
+      });
+
+      btn.disabled = false;
+      btn.textContent = '저장하기';
+
+      if (error) { showToast('⚠ 저장 오류: ' + error.message); return; }
+
+      showToast('✓ 알림장이 저장됐어요!');
+      setTimeout(() => location.reload(), 1200);
+    }
+
+    // ── utils ────────────────────────────────────────────────
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function showToast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+  </script>
+</body>
+</html>
