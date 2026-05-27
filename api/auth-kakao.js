@@ -38,10 +38,9 @@ module.exports = async function handler(req, res) {
     const token = await tokenRes.json();
 
     if (!token.access_token) {
-      console.error('[auth-kakao] 토큰 오류 전체:', JSON.stringify(token));
-      console.error('[auth-kakao] 사용한 redirect_uri:', redirectUri);
-      console.error('[auth-kakao] code 앞10자:', code?.slice(0, 10));
-      return res.redirect('/?kakao=error');
+      // 디버그: 에러 전체를 화면에 표시
+      const errMsg = encodeURIComponent(JSON.stringify(token));
+      return res.redirect(`/?kakao=error&msg=${errMsg}`);
     }
 
     // ── 2. access_token → 사용자 정보 ────────────────────────
