@@ -51,6 +51,28 @@ async function submitReservation(formData) {
   });
 
   if (error) throw error;
+
+  // 이메일 알림 발송 (실패해도 예약 자체는 성공 처리)
+  try {
+    await fetch('/api/send-email', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'reservation_new',
+        data: {
+          ownerName:    formData.owner_name,
+          ownerEmail:   formData.owner_email,
+          ownerPhone:   formData.owner_phone,
+          petName:      formData.pet_name,
+          petBreed:     formData.pet_breed,
+          checkinDate:  formData.checkin_date,
+          checkoutDate: formData.checkout_date,
+          roomType:     formData.room_type,
+        },
+      }),
+    });
+  } catch (e) { console.warn('[email] 발송 실패 (무시):', e); }
+
   return { id: data };
 }
 

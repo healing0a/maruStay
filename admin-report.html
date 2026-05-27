@@ -262,10 +262,12 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqenhwcXRrcGFlaGF6d3RvbmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTYwMTMsImV4cCI6MjA5NTE5MjAxM30.M8CqLiIQeOSfoWh-rpQ-lkrnUEWhU9pS7v72vUZfxIs';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const params  = new URLSearchParams(location.search);
-    const rid     = params.get('rid');
-    const petName = params.get('pname') || '반려동물';
-    const adminPw = sessionStorage.getItem('marustay_admin_pw');
+    const params      = new URLSearchParams(location.search);
+    const rid         = params.get('rid');
+    const petName     = params.get('pname')  || '반려동물';
+    const ownerEmail  = params.get('email')  || '';
+    const ownerName   = params.get('oname')  || '';
+    const adminPw     = sessionStorage.getItem('marustay_admin_pw');
 
     // auth check
     if (!adminPw) {
@@ -416,7 +418,32 @@
       if (error) { showToast('⚠ 저장 오류: ' + error.message); return; }
 
       showToast('✓ 알림장이 저장됐어요!');
-      setTimeout(() => location.reload(), 1200);
+
+      // 손님에게 이메일 발송
+      if (ownerEmail) {
+        const reportDate = document.getElementById('reportDate').value;
+        const reportLink = `${location.origin}/report.html?rid=${rid}&pname=${encodeURIComponent(petName)}`;
+        try {
+          await fetch('/api/send-email', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'report_ready',
+              data: {
+                ownerName,
+                ownerEmail,
+                petName,
+                reportDate,
+                reportContent: content,
+                reportLink,
+              },
+            }),
+          });
+          showToast('📧 손님에게 알림장 이메일도 발송됐어요!');
+        } catch (e) { console.warn('[email] 발송 실패:', e); }
+      }
+
+      setTimeout(() => location.reload(), 1800);
     }
 
     // ── utils ────────────────────────────────────────────────
