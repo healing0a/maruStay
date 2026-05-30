@@ -134,6 +134,63 @@
     .btn-report:hover { background: var(--sand); }
 
     .loading { text-align: center; padding: 40px; color: var(--brown); font-size: 14px; }
+
+    /* 인증 카드 */
+    .cert-banner {
+      border-radius: 16px; padding: 18px 20px; margin-top: 14px;
+      box-shadow: 0 2px 16px rgba(140,80,20,.08);
+    }
+    .cert-banner.none {
+      background: linear-gradient(135deg, #fff8ec 0%, #fef3e2 100%);
+      border: 1.5px dashed var(--accent);
+    }
+    .cert-banner.pending { background: #fff3e0; border: 1.5px solid #ffe0b2; }
+    .cert-banner.basic   { background: linear-gradient(135deg, #e8f5e9, #f1f8f1); border: 1.5px solid #a5d6a7; }
+    .cert-banner.trusted { background: linear-gradient(135deg, #e3f2fd, #eff8ff); border: 1.5px solid #90caf9; }
+    .cert-banner.rejected{ background: #fafafa; border: 1.5px solid #eee; }
+
+    .cert-title { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+    .cert-desc  { font-size: 13px; line-height: 1.7; color: var(--brown); margin-bottom: 14px; }
+
+    .cert-check-grid { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+    .cert-check label {
+      display: flex; align-items: center; gap: 6px;
+      background: #fff; border: 1.5px solid var(--sand); border-radius: 20px;
+      padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+      color: var(--brown); transition: all .15s;
+    }
+    .cert-check input[type=checkbox] { display: none; }
+    .cert-check input:checked + span { color: var(--text); }
+    .cert-check input:checked ~ span { color: var(--text); }
+    .cert-check:has(input:checked) label { background: var(--cream); border-color: var(--accent); color: var(--text); }
+
+    .cert-note {
+      width: 100%; padding: 10px 14px; font-size: 13px;
+      border: 1.5px solid var(--sand); border-radius: 10px; margin-bottom: 12px;
+      font-family: 'Pretendard', sans-serif; outline: none; resize: none;
+      background: #fff;
+    }
+    .cert-note:focus { border-color: var(--accent); }
+
+    .btn-cert {
+      width: 100%; padding: 13px; font-size: 14px; font-weight: 800;
+      background: linear-gradient(135deg, #c87c3a, #7a4520); color: #fff;
+      border: none; border-radius: 12px; cursor: pointer;
+      font-family: 'Pretendard', sans-serif; transition: opacity .2s;
+    }
+    .btn-cert:hover { opacity: .88; }
+
+    .badge-level {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 16px; font-weight: 800; margin-bottom: 4px;
+    }
+    .cert-benefit {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+    }
+    .cert-benefit span {
+      background: rgba(255,255,255,.7); border-radius: 20px;
+      padding: 4px 10px; font-size: 11px; font-weight: 700; color: var(--brown);
+    }
   </style>
 </head>
 <body>
@@ -166,6 +223,9 @@
           <div class="user-sub">카카오 로그인으로 조회 중</div>
         </div>
       </div>
+
+      <!-- 안심 보호자 인증 카드 -->
+      <div id="certSection"></div>
 
       <!-- 마루 크레딧 카드 -->
       <div id="creditCard" style="display:none;background:#fff;border-radius:16px;padding:18px 20px;
@@ -229,10 +289,99 @@
         // kakao_id로 바로 조회 — 전화번호 입력 불필요
         loadReservations(user.kakaoId);
         loadCredits(user.kakaoId);
+        loadCertification(user.kakaoId, user.nickname || '');
       } catch (e) {
         document.getElementById('loginRequired').style.display = 'block';
       }
     })();
+
+    // ── 안심 보호자 인증 ─────────────────────────────────────
+    const CERT_ITEMS = [
+      { key: 'cert_emergency',    icon: '🚨', label: '비상연락망 2개 이상' },
+      { key: 'cert_registration', icon: '🪪', label: '동물등록 완료' },
+      { key: 'cert_vaccination',  icon: '💉', label: '예방접종 최신화' },
+      { key: 'cert_neutered',     icon: '✂️', label: '중성화 완료' },
+      { key: 'cert_insurance',    icon: '🛡️', label: '반려동물 보험' },
+      { key: 'cert_education',    icon: '🎓', label: '교육 이수' },
+    ];
+
+    async function loadCertification(kakaoId, nickname) {
+      const el = document.getElementById('certSection');
+      const { data } = await db.rpc('get_my_certification', { p_kakao_id: kakaoId });
+
+      if (!data || data.status === 'rejected') {
+        // 미신청 or 반려 → 신청 폼 표시
+        el.innerHTML = `
+          <div class="cert-banner none">
+            <div class="cert-title">🏅 안심 보호자 인증 신청</div>
+            <div class="cert-desc">
+              책임감 있는 보호자에게 마루 크레딧을 드려요.<br>
+              <strong>기본 보호자 3,000원 · 안심 보호자 10,000원</strong> 크레딧 지급!<br>
+              ${data?.status === 'rejected' && data.admin_note ? `<span style="color:#e74c3c;font-size:12px">반려 사유: ${esc(data.admin_note)}</span>` : ''}
+            </div>
+            <div class="cert-check-grid">${CERT_ITEMS.map(it => `
+              <div class="cert-check">
+                <label><input type="checkbox" id="ci_${it.key}"
+                  ${data && data[it.key] ? 'checked' : ''}><span>${it.icon} ${it.label}</span></label>
+              </div>`).join('')}
+            </div>
+            <textarea class="cert-note" id="certNote" rows="2"
+              placeholder="한 마디 남겨주세요 (예: 강아지 등록증 지참 예정이에요)">${data?.applicant_note || ''}</textarea>
+            <button class="btn-cert" onclick="submitCert('${kakaoId}','${esc(nickname)}')">인증 신청하기 →</button>
+          </div>`;
+      } else if (data.status === 'pending') {
+        const checked = CERT_ITEMS.filter(it => data[it.key]);
+        el.innerHTML = `
+          <div class="cert-banner pending">
+            <div class="cert-title">⏳ 인증 검토 중이에요</div>
+            <div class="cert-desc">체크인 시 서류를 지참해주시면 확인 후 크레딧을 드려요!</div>
+            <div class="cert-check-grid">${checked.map(it =>
+              `<span style="display:inline-flex;align-items:center;gap:5px;background:#fff;border:1.5px solid var(--sand);
+               border-radius:20px;padding:5px 11px;font-size:12px;font-weight:600;color:var(--brown)">
+               ${it.icon} ${it.label}</span>`).join('')}
+            </div>
+            <button class="btn-cert" style="background:#aaa" onclick="loadCertification('${kakaoId}','${esc(nickname)}')">신청 내용 수정하기</button>
+          </div>`;
+      } else if (data.status === 'basic' || data.status === 'trusted') {
+        const isBasic = data.status === 'basic';
+        el.innerHTML = `
+          <div class="cert-banner ${data.status}">
+            <div class="badge-level">${isBasic ? '🐾 기본 보호자' : '⭐ 안심 보호자'} 인증 완료</div>
+            <div style="font-size:13px;color:var(--brown)">
+              믿을 수 있는 보호자로 인증되셨어요 💛<br>
+              ${data.bonus_credited ? `<strong>${Number(data.bonus_credited).toLocaleString()}원</strong> 크레딧이 지급됐어요!` : ''}
+            </div>
+            <div class="cert-benefit">
+              <span>✓ 크레딧 혜택 적용 중</span>
+              ${!isBasic ? '<span>✓ 마일리지 우대 적립</span>' : ''}
+              <span>✓ 예약 우선 배정</span>
+            </div>
+          </div>`;
+      }
+    }
+
+    async function submitCert(kakaoId, nickname) {
+      const vals = {};
+      CERT_ITEMS.forEach(it => { vals[it.key] = document.getElementById('ci_' + it.key)?.checked || false; });
+      const note = document.getElementById('certNote')?.value.trim() || '';
+
+      if (!vals.cert_emergency && !vals.cert_registration) {
+        alert('비상연락망 또는 동물등록 항목을 최소 1개 이상 체크해주세요.');
+        return;
+      }
+      const { error } = await db.rpc('apply_certification', {
+        p_kakao_id: kakaoId, p_nickname: nickname,
+        p_cert_emergency:   vals.cert_emergency,
+        p_cert_registration:vals.cert_registration,
+        p_cert_vaccination: vals.cert_vaccination,
+        p_cert_neutered:    vals.cert_neutered,
+        p_cert_insurance:   vals.cert_insurance,
+        p_cert_education:   vals.cert_education,
+        p_applicant_note:   note,
+      });
+      if (error) { alert('오류: ' + error.message); return; }
+      loadCertification(kakaoId, nickname);
+    }
 
     // ── 크레딧 조회 ─────────────────────────────────────────
     async function loadCredits(kakaoId) {

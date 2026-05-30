@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>안심 보호자 인증 관리 — MaruStay</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+  <style>
+    :root {
+      --brown-dk:#3d1e08; --brown:#7a4520; --accent:#c87c3a;
+      --cream:#fff8ec; --sand:#f5e8d2; --text:#3a2010;
+      --green:#5aaa50; --blue:#3a82f7; --gold:#f0a500; --red:#e74c3c;
+      --purple:#9c6fc8;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Pretendard',sans-serif;background:#f5f0eb;color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+    .admin-header{background:var(--brown-dk);color:#fff;padding:14px 24px;display:flex;
+      align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,.2);}
+    .admin-header h1{font-size:16px;font-weight:800;}
+    .admin-header span{font-size:12px;opacity:.6;display:block;margin-top:2px;}
+    .btn-back{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);
+      border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;
+      cursor:pointer;font-family:'Pretendard',sans-serif;text-decoration:none;transition:background .2s;}
+    .btn-back:hover{background:rgba(255,255,255,.22);}
+
+    /* FILTER TABS */
+    .filter-bar{display:flex;gap:8px;padding:14px 20px;background:#fff;
+      border-bottom:1px solid var(--sand);overflow-x:auto;}
+    .filter-btn{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;
+      border:1.5px solid var(--sand);background:var(--cream);color:var(--brown);
+      cursor:pointer;white-space:nowrap;transition:all .15s;font-family:'Pretendard',sans-serif;}
+    .filter-btn.active{background:var(--brown-dk);color:#fff;border-color:var(--brown-dk);}
+    .filter-btn .cnt{opacity:.7;margin-left:4px;}
+
+    /* CARDS */
+    .container{max-width:800px;margin:0 auto;padding:16px 16px 60px;}
+    .cert-card{background:#fff;border-radius:16px;padding:18px 20px;
+      margin-bottom:12px;box-shadow:0 2px 12px rgba(140,80,20,.07);}
+
+    .cert-card.pending  {border-left:4px solid var(--gold);}
+    .cert-card.basic    {border-left:4px solid var(--green);}
+    .cert-card.trusted  {border-left:4px solid var(--blue);}
+    .cert-card.rejected {border-left:4px solid #ccc;opacity:.7;}
+
+    .cert-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+    .cert-name{font-size:16px;font-weight:800;}
+    .cert-sub{font-size:12px;color:var(--brown);margin-top:2px;}
+
+    .status-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+    .badge-pending  {background:#fff3e0;color:#e67e00;}
+    .badge-basic    {background:#e8f5e9;color:#2e7d32;}
+    .badge-trusted  {background:#e3f2fd;color:#1565c0;}
+    .badge-rejected {background:#f5f5f5;color:#757575;}
+
+    /* 체크리스트 */
+    .checklist{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+    .check-item{display:inline-flex;align-items:center;gap:5px;
+      padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;}
+    .check-item.on {background:#e8f5e9;color:#2e7d32;}
+    .check-item.off{background:#f5f5f5;color:#aaa;text-decoration:line-through;}
+
+    /* 신청 메모 */
+    .applicant-note{background:var(--cream);border-radius:10px;padding:10px 14px;
+      font-size:13px;color:var(--brown);line-height:1.7;margin-bottom:14px;}
+
+    /* 관리자 메모 */
+    .admin-note-box{font-size:12px;color:var(--brown);background:#f9f4ef;
+      border-radius:8px;padding:8px 12px;margin-bottom:10px;font-style:italic;}
+
+    /* 액션 */
+    .cert-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+    .note-input{flex:1;min-width:160px;padding:8px 12px;font-size:13px;
+      border:1.5px solid var(--sand);border-radius:8px;
+      font-family:'Pretendard',sans-serif;outline:none;}
+    .note-input:focus{border-color:var(--accent);}
+    .btn-basic   {padding:8px 16px;background:#e8f5e9;color:#2e7d32;border:none;border-radius:20px;
+      font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;transition:opacity .2s;}
+    .btn-trusted {padding:8px 16px;background:#e3f2fd;color:#1565c0;border:none;border-radius:20px;
+      font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;transition:opacity .2s;}
+    .btn-reject  {padding:8px 16px;background:#fce4e4;color:#c62828;border:none;border-radius:20px;
+      font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;transition:opacity .2s;}
+    .btn-basic:hover,.btn-trusted:hover,.btn-reject:hover{opacity:.8;}
+
+    .date-str{font-size:11px;color:#aaa;margin-left:auto;white-space:nowrap;}
+
+    .empty{text-align:center;padding:60px 20px;color:var(--brown);font-size:14px;}
+    .loading{text-align:center;padding:60px 20px;color:var(--brown);font-size:14px;}
+
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+      background:#3d1e08;color:#fff;padding:12px 24px;border-radius:50px;
+      box-shadow:0 8px 32px rgba(0,0,0,.25);font-size:14px;font-weight:600;
+      z-index:9999;white-space:nowrap;animation:fadeUp .3s ease;pointer-events:none;}
+    @keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+  </style>
+</head>
+<body>
+
+<div class="admin-header">
+  <div>
+    <h1>🏅 안심 보호자 인증 관리</h1>
+    <span>신청 검토 · 승인 · 크레딧 자동 지급</span>
+  </div>
+  <a href="admin.html" class="btn-back">← 관리자</a>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" data-f="all"      onclick="setFilter('all')">전체 <span class="cnt" id="cntAll"></span></button>
+  <button class="filter-btn"        data-f="pending"  onclick="setFilter('pending')">⏳ 검토 대기 <span class="cnt" id="cntPending"></span></button>
+  <button class="filter-btn"        data-f="basic"    onclick="setFilter('basic')">🐾 기본 보호자 <span class="cnt" id="cntBasic"></span></button>
+  <button class="filter-btn"        data-f="trusted"  onclick="setFilter('trusted')">⭐ 안심 보호자 <span class="cnt" id="cntTrusted"></span></button>
+  <button class="filter-btn"        data-f="rejected" onclick="setFilter('rejected')">❌ 반려 <span class="cnt" id="cntRejected"></span></button>
+</div>
+
+<div class="container">
+  <div id="listWrap"><div class="loading">⏳ 불러오는 중...</div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://sjzxpqtkpaehazwtonge.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqenhwcXRrcGFlaGF6d3RvbmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTYwMTMsImV4cCI6MjA5NTE5MjAxM30.M8CqLiIQeOSfoWh-rpQ-lkrnUEWhU9pS7v72vUZfxIs';
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const adminPw = sessionStorage.getItem('marustay_admin_pw');
+  if (!adminPw) { alert('관리자 로그인이 필요합니다.'); location.href = 'admin.html'; }
+
+  let allData = [], curFilter = 'all';
+
+  const ITEMS = [
+    { key: 'cert_emergency',    icon: '🚨', label: '비상연락망 2개+' },
+    { key: 'cert_registration', icon: '🪪', label: '동물등록' },
+    { key: 'cert_vaccination',  icon: '💉', label: '예방접종 최신화' },
+    { key: 'cert_neutered',     icon: '✂️', label: '중성화 완료' },
+    { key: 'cert_insurance',    icon: '🛡️', label: '반려동물 보험' },
+    { key: 'cert_education',    icon: '🎓', label: '교육 이수' },
+  ];
+
+  (async function load() {
+    const { data, error } = await db.rpc('admin_get_certifications', { p_password: adminPw });
+    if (error) { document.getElementById('listWrap').innerHTML = '<div class="empty">⚠️ 조회 오류: ' + error.message + '</div>'; return; }
+    allData = data || [];
+    updateCounts();
+    render();
+  })();
+
+  function updateCounts() {
+    const cnt = { all: allData.length, pending: 0, basic: 0, trusted: 0, rejected: 0 };
+    allData.forEach(r => { if (cnt[r.status] !== undefined) cnt[r.status]++; });
+    document.getElementById('cntAll').textContent     = cnt.all     ? '(' + cnt.all     + ')' : '';
+    document.getElementById('cntPending').textContent = cnt.pending ? '(' + cnt.pending + ')' : '';
+    document.getElementById('cntBasic').textContent   = cnt.basic   ? '(' + cnt.basic   + ')' : '';
+    document.getElementById('cntTrusted').textContent = cnt.trusted ? '(' + cnt.trusted + ')' : '';
+    document.getElementById('cntRejected').textContent= cnt.rejected? '(' + cnt.rejected + ')' : '';
+  }
+
+  function setFilter(f) {
+    curFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.filter-btn[data-f="' + f + '"]').classList.add('active');
+    render();
+  }
+
+  function render() {
+    const rows = curFilter === 'all' ? allData : allData.filter(r => r.status === curFilter);
+    if (!rows.length) {
+      document.getElementById('listWrap').innerHTML = '<div class="empty">📋 해당하는 신청이 없어요</div>';
+      return;
+    }
+    document.getElementById('listWrap').innerHTML = rows.map(buildCard).join('');
+  }
+
+  function buildCard(r) {
+    const STATUS = { pending:'⏳ 검토 대기', basic:'🐾 기본 보호자', trusted:'⭐ 안심 보호자', rejected:'❌ 반려' };
+    const BADGE  = { pending:'badge-pending', basic:'badge-basic', trusted:'badge-trusted', rejected:'badge-rejected' };
+    const fmtDate = d => d ? new Date(d).toLocaleDateString('ko-KR', { year:'2-digit', month:'numeric', day:'numeric' }) : '-';
+
+    const checklist = ITEMS.map(it =>
+      `<span class="check-item ${r[it.key] ? 'on' : 'off'}">${it.icon} ${it.label}</span>`
+    ).join('');
+
+    const actions = r.status === 'pending' ? `
+      <div class="cert-actions">
+        <input class="note-input" id="note-${r.kakao_id}" placeholder="메모 (선택)">
+        <button class="btn-basic"   onclick="approve('${r.kakao_id}','basic')">🐾 기본 승인 (+3,000원)</button>
+        <button class="btn-trusted" onclick="approve('${r.kakao_id}','trusted')">⭐ 안심 승인 (+10,000원)</button>
+        <button class="btn-reject"  onclick="reject('${r.kakao_id}')">❌ 반려</button>
+        <span class="date-str">신청 ${fmtDate(r.applied_at)}</span>
+      </div>` :
+      `<div class="cert-actions">
+        <span style="font-size:12px;color:var(--brown)">
+          ${r.status !== 'rejected' ? '✓ ' + r.bonus_credited.toLocaleString() + '원 크레딧 지급됨 &nbsp;·&nbsp; ' : ''}
+          ${r.status === 'rejected' ? '반려일: ' : '승인일: '}${fmtDate(r.approved_at)}
+        </span>
+        ${r.status !== 'pending' ? `<button class="btn-basic" onclick="reopen('${r.kakao_id}')">재검토</button>` : ''}
+      </div>`;
+
+    return `
+      <div class="cert-card ${r.status}">
+        <div class="cert-header">
+          <div>
+            <div class="cert-name">${esc(r.nickname || '이름 없음')}</div>
+            <div class="cert-sub">${esc(r.kakao_id)}</div>
+          </div>
+          <span class="status-badge ${BADGE[r.status]}">${STATUS[r.status]}</span>
+        </div>
+        <div class="checklist">${checklist}</div>
+        ${r.applicant_note ? `<div class="applicant-note">💬 "${esc(r.applicant_note)}"</div>` : ''}
+        ${r.admin_note ? `<div class="admin-note-box">📝 관리자 메모: ${esc(r.admin_note)}</div>` : ''}
+        ${actions}
+      </div>`;
+  }
+
+  async function approve(kid, level) {
+    const note = document.getElementById('note-' + kid)?.value || '';
+    const { data, error } = await db.rpc('admin_approve_certification', {
+      p_password: adminPw, p_kakao_id: kid, p_level: level, p_admin_note: note
+    });
+    if (error) { showToast('⚠ 오류: ' + error.message); return; }
+    const bonus = level === 'basic' ? 3000 : 10000;
+    showToast(`✓ ${level === 'basic' ? '🐾 기본' : '⭐ 안심'} 보호자 승인! ${bonus.toLocaleString()}원 크레딧 지급`);
+    await reload();
+  }
+
+  async function reject(kid) {
+    const note = document.getElementById('note-' + kid)?.value || '';
+    const { error } = await db.rpc('admin_reject_certification', {
+      p_password: adminPw, p_kakao_id: kid, p_admin_note: note
+    });
+    if (error) { showToast('⚠ 오류: ' + error.message); return; }
+    showToast('반려 처리됐어요');
+    await reload();
+  }
+
+  async function reopen(kid) {
+    // status를 pending으로 되돌리기
+    const { error } = await db.rpc('admin_reject_certification', {
+      p_password: adminPw, p_kakao_id: kid, p_admin_note: '재검토'
+    });
+    if (error) { showToast('⚠ 오류: ' + error.message); return; }
+    // 다시 pending으로
+    await supabase.from('guardian_certifications').update({ status: 'pending' }).eq('kakao_id', kid);
+    showToast('재검토 상태로 변경됐어요');
+    await reload();
+  }
+
+  async function reload() {
+    const { data } = await db.rpc('admin_get_certifications', { p_password: adminPw });
+    allData = data || [];
+    updateCounts();
+    render();
+  }
+
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function showToast(msg) {
+    const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg;
+    document.body.appendChild(el); setTimeout(() => el.remove(), 3000);
+  }
+</script>
+</body>
+</html>
