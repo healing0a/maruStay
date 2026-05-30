@@ -167,6 +167,24 @@
         </div>
       </div>
 
+      <!-- 마루 크레딧 카드 -->
+      <div id="creditCard" style="display:none;background:#fff;border-radius:16px;padding:18px 20px;
+           margin-top:14px;box-shadow:0 2px 16px rgba(140,80,20,.08);
+           background:linear-gradient(135deg,#3d1e08 0%,#7a4520 100%);color:#fff;">
+        <div style="font-size:12px;opacity:.7;margin-bottom:6px">💰 마루 크레딧</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:26px;font-weight:800" id="creditTotal">-</div>
+            <div style="font-size:11px;opacity:.65;margin-top:2px">총 사용 가능 크레딧</div>
+          </div>
+          <div style="text-align:right;font-size:12px;opacity:.75;line-height:2">
+            <div>💙 충전: <strong id="creditCharged">-</strong>원</div>
+            <div>💚 마일리지: <strong id="creditEarned">-</strong>원</div>
+            <div style="color:#ffd54f">🌟 미지급 이자: <strong id="creditInterest">-</strong>원</div>
+          </div>
+        </div>
+      </div>
+
       <div id="results"></div>
 
     </div>
@@ -210,10 +228,24 @@
 
         // kakao_id로 바로 조회 — 전화번호 입력 불필요
         loadReservations(user.kakaoId);
+        loadCredits(user.kakaoId);
       } catch (e) {
         document.getElementById('loginRequired').style.display = 'block';
       }
     })();
+
+    // ── 크레딧 조회 ─────────────────────────────────────────
+    async function loadCredits(kakaoId) {
+      const { data, error } = await db.rpc('get_my_credits', { p_kakao_id: kakaoId });
+      if (error || !data) return;
+      const total = (data.total_balance || 0) + (data.accrued_interest || 0);
+      if (total === 0 && !data.charged_balance && !data.earned_balance) return;
+      document.getElementById('creditCard').style.display = 'block';
+      document.getElementById('creditTotal').textContent    = Number(total).toLocaleString('ko-KR') + '원';
+      document.getElementById('creditCharged').textContent  = Number(data.charged_balance||0).toLocaleString('ko-KR');
+      document.getElementById('creditEarned').textContent   = Number(data.earned_balance||0).toLocaleString('ko-KR');
+      document.getElementById('creditInterest').textContent = Number(data.accrued_interest||0).toLocaleString('ko-KR');
+    }
 
     // ── 예약 조회 ────────────────────────────────────────────
     async function loadReservations(kakaoId) {

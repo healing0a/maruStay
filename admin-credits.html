@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>크레딧 관리 — MaruStay 관리자</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+  <style>
+    :root {
+      --brown-dk: #3d1e08; --brown: #7a4520; --accent: #c87c3a;
+      --cream: #fff8ec; --sand: #f5e8d2; --text: #3a2010;
+      --green: #5aaa50; --blue: #3a82f7; --gold: #f0a500; --red: #e74c3c;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Pretendard',sans-serif; background:#f5f0eb; color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+    /* HEADER */
+    .admin-header {
+      background:var(--brown-dk); color:#fff;
+      padding:14px 24px; display:flex; align-items:center;
+      justify-content:space-between; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,.2);
+    }
+    .admin-header h1 { font-size:16px; font-weight:800; }
+    .admin-header span { font-size:12px; opacity:.6; display:block; margin-top:2px; }
+    .btn-back {
+      background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.2);
+      border-radius:20px; padding:6px 14px; font-size:12px; font-weight:600;
+      cursor:pointer; font-family:'Pretendard',sans-serif; text-decoration:none; transition:background .2s;
+    }
+    .btn-back:hover { background:rgba(255,255,255,.22); }
+
+    /* SUMMARY CARDS */
+    .summary-row {
+      display:flex; gap:12px; padding:16px 20px;
+      background:#fff; border-bottom:1px solid var(--sand); overflow-x:auto;
+    }
+    .sum-card {
+      flex:0 0 auto; min-width:120px; background:var(--cream);
+      border-radius:12px; padding:12px 16px; text-align:center;
+    }
+    .sum-card .num { font-size:20px; font-weight:800; color:var(--brown-dk); }
+    .sum-card .lbl { font-size:11px; color:var(--brown); margin-top:3px; }
+
+    /* TOOLBAR */
+    .toolbar {
+      display:flex; gap:10px; padding:12px 20px;
+      background:#fff; border-bottom:1px solid var(--sand); flex-wrap:wrap; align-items:center;
+    }
+    .toolbar input[type=search] {
+      flex:1; min-width:180px; max-width:300px; padding:9px 14px; font-size:14px;
+      border:1.5px solid var(--sand); border-radius:8px;
+      font-family:'Pretendard',sans-serif; outline:none;
+    }
+    .toolbar input:focus { border-color:var(--accent); }
+    .btn-new {
+      padding:9px 18px; background:var(--gold); color:#fff;
+      border:none; border-radius:8px; font-size:13px; font-weight:700;
+      font-family:'Pretendard',sans-serif; cursor:pointer; transition:opacity .2s;
+    }
+    .btn-new:hover { opacity:.85; }
+
+    /* TABLE */
+    .table-wrap { overflow-x:auto; padding-bottom:60px; }
+    table { width:100%; min-width:720px; border-collapse:collapse; font-size:13px; }
+    thead tr { background:var(--brown-dk); color:#fff; }
+    thead th { padding:11px 14px; text-align:left; font-size:12px; font-weight:600; white-space:nowrap; }
+    tbody tr { border-bottom:1px solid #ede5d8; transition:background .12s; cursor:pointer; }
+    tbody tr:hover { background:#fdf6ee; }
+    tbody tr.expanded { background:#fdf0e0; }
+    td { padding:11px 14px; vertical-align:middle; }
+
+    .badge-charged { background:#e3f2fd; color:#1565c0; font-size:11px; font-weight:700; padding:3px 8px; border-radius:12px; }
+    .badge-earned  { background:#e8f5e9; color:#2e7d32; font-size:11px; font-weight:700; padding:3px 8px; border-radius:12px; }
+    .badge-interest{ background:#fff8e1; color:#e65100; font-size:11px; font-weight:700; padding:3px 8px; border-radius:12px; }
+    .total-val { font-size:15px; font-weight:800; color:var(--brown-dk); }
+
+    /* DETAIL PANEL */
+    .detail-row { display:none; }
+    .detail-row.open { display:table-row; }
+    .detail-row td { background:#fffbf5; padding:16px 20px; border-bottom:2px solid var(--sand); }
+
+    .action-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px; margin-bottom:16px; }
+    .action-box {
+      background:#fff; border:1.5px solid var(--sand); border-radius:12px;
+      padding:14px 16px;
+    }
+    .action-box h4 { font-size:13px; font-weight:700; margin-bottom:10px; color:var(--brown); }
+    .action-box input, .action-box textarea {
+      width:100%; padding:8px 10px; font-size:13px; margin-bottom:8px;
+      border:1.5px solid var(--sand); border-radius:8px;
+      font-family:'Pretendard',sans-serif; outline:none;
+    }
+    .action-box input:focus, .action-box textarea:focus { border-color:var(--accent); }
+    .btn-action {
+      width:100%; padding:9px; font-size:13px; font-weight:700; border:none;
+      border-radius:8px; cursor:pointer; font-family:'Pretendard',sans-serif; transition:opacity .2s;
+    }
+    .btn-action:hover { opacity:.85; }
+    .btn-charge  { background:var(--blue);  color:#fff; }
+    .btn-earn    { background:var(--green); color:#fff; }
+    .btn-interest{ background:var(--gold);  color:#fff; }
+    .btn-use     { background:var(--red);   color:#fff; }
+
+    /* TXN HISTORY */
+    .txn-list { margin-top:14px; }
+    .txn-title { font-size:12px; font-weight:700; color:var(--brown); margin-bottom:8px; }
+    .txn-item {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:8px 10px; background:#fff; border-radius:8px; margin-bottom:5px;
+      font-size:12px; border:1px solid #f0e8da;
+    }
+    .txn-item .txn-desc { color:var(--brown); }
+    .txn-item .txn-date { color:#aaa; font-size:11px; margin-top:2px; }
+    .txn-item .txn-amt  { font-weight:800; white-space:nowrap; margin-left:12px; }
+    .txn-item .txn-amt.plus  { color:var(--green); }
+    .txn-item .txn-amt.minus { color:var(--red); }
+
+    .loading-row td, .empty-row td { text-align:center; padding:50px; color:var(--brown); font-size:14px; }
+
+    /* NEW CUSTOMER MODAL */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,.45);
+      z-index:200; align-items:center; justify-content:center; padding:20px;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal {
+      background:#fff; border-radius:20px; padding:28px 28px;
+      width:100%; max-width:400px; box-shadow:0 8px 40px rgba(0,0,0,.18);
+    }
+    .modal h3 { font-size:17px; font-weight:800; margin-bottom:18px; }
+    .modal input {
+      width:100%; padding:11px 14px; font-size:14px; margin-bottom:10px;
+      border:1.5px solid var(--sand); border-radius:10px;
+      font-family:'Pretendard',sans-serif; outline:none;
+    }
+    .modal input:focus { border-color:var(--accent); }
+    .modal-btns { display:flex; gap:8px; margin-top:6px; }
+    .btn-modal-cancel {
+      flex:1; padding:12px; background:var(--cream); color:var(--brown);
+      border:1.5px solid var(--sand); border-radius:10px; font-size:14px;
+      font-weight:700; cursor:pointer; font-family:'Pretendard',sans-serif;
+    }
+    .btn-modal-ok {
+      flex:2; padding:12px; background:var(--brown-dk); color:#fff;
+      border:none; border-radius:10px; font-size:14px; font-weight:700;
+      cursor:pointer; font-family:'Pretendard',sans-serif;
+    }
+
+    .toast {
+      position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+      background:#3d1e08; color:#fff; padding:12px 24px; border-radius:50px;
+      box-shadow:0 8px 32px rgba(0,0,0,.25); font-size:14px; font-weight:600;
+      z-index:9999; white-space:nowrap; animation:fadeUp .3s ease; pointer-events:none;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+  </style>
+</head>
+<body>
+
+<div class="admin-header">
+  <div>
+    <h1>💰 마루 크레딧 관리</h1>
+    <span>선불 충전 · 마일리지 · 이자 지급</span>
+  </div>
+  <a href="admin.html" class="btn-back">← 관리자</a>
+</div>
+
+<!-- 요약 카드 -->
+<div class="summary-row">
+  <div class="sum-card">
+    <div class="num" id="sumTotal">-</div>
+    <div class="lbl">전체 회원</div>
+  </div>
+  <div class="sum-card">
+    <div class="num" id="sumCharged" style="color:var(--blue)">-</div>
+    <div class="lbl">총 충전 잔액</div>
+  </div>
+  <div class="sum-card">
+    <div class="num" id="sumEarned" style="color:var(--green)">-</div>
+    <div class="lbl">총 마일리지</div>
+  </div>
+  <div class="sum-card">
+    <div class="num" id="sumInterest" style="color:var(--gold)">-</div>
+    <div class="lbl">미지급 이자 합계</div>
+  </div>
+</div>
+
+<!-- 툴바 -->
+<div class="toolbar">
+  <input type="search" id="searchBox" placeholder="🔍  이름 또는 카카오 ID 검색..." oninput="renderTable()">
+  <button class="btn-new" onclick="openNewModal()">＋ 신규 고객 등록</button>
+</div>
+
+<!-- 테이블 -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>고객</th>
+        <th>충전 크레딧</th>
+        <th>마일리지</th>
+        <th>미지급 이자</th>
+        <th>총 잔액</th>
+        <th>마지막 이자 지급</th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+      <tr class="loading-row"><td colspan="6">⏳ 불러오는 중...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 신규 고객 모달 -->
+<div class="modal-overlay" id="newModal">
+  <div class="modal">
+    <h3>➕ 신규 고객 크레딧 등록</h3>
+    <input type="text" id="newKakaoId"  placeholder="카카오 ID (숫자)">
+    <input type="text" id="newNickname" placeholder="이름 (닉네임)">
+    <input type="number" id="newAmount" placeholder="초기 충전 금액 (원)" min="0">
+    <input type="text" id="newDesc"     placeholder="메모 (예: 웰컴 보너스)">
+    <div class="modal-btns">
+      <button class="btn-modal-cancel" onclick="closeNewModal()">취소</button>
+      <button class="btn-modal-ok"     onclick="submitNew()">등록하기</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://sjzxpqtkpaehazwtonge.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqenhwcXRrcGFlaGF6d3RvbmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTYwMTMsImV4cCI6MjA5NTE5MjAxM30.M8CqLiIQeOSfoWh-rpQ-lkrnUEWhU9pS7v72vUZfxIs';
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const adminPw = sessionStorage.getItem('marustay_admin_pw');
+  if (!adminPw) { alert('관리자 로그인이 필요합니다.'); location.href = 'admin.html'; }
+
+  let allData = [];
+
+  // ── 로드 ─────────────────────────────────────────────────
+  (async function load() {
+    const { data, error } = await db.rpc('admin_get_all_credits', { p_password: adminPw });
+    if (error) { showToast('⚠ 조회 오류: ' + error.message); return; }
+    allData = data || [];
+    renderSummary();
+    renderTable();
+  })();
+
+  function renderSummary() {
+    document.getElementById('sumTotal').textContent    = allData.length + '명';
+    document.getElementById('sumCharged').textContent  = fmt(allData.reduce((s,r)=>s+r.charged_balance,0)) + '원';
+    document.getElementById('sumEarned').textContent   = fmt(allData.reduce((s,r)=>s+r.earned_balance,0)) + '원';
+    document.getElementById('sumInterest').textContent = fmt(allData.reduce((s,r)=>s+(r.accrued_interest||0),0)) + '원';
+  }
+
+  function renderTable() {
+    const q = document.getElementById('searchBox').value.toLowerCase();
+    let rows = allData;
+    if (q) rows = rows.filter(r =>
+      (r.nickname||'').toLowerCase().includes(q) || (r.kakao_id||'').includes(q)
+    );
+    if (!rows.length) {
+      document.getElementById('tbody').innerHTML = '<tr class="empty-row"><td colspan="6">💰 등록된 크레딧 회원이 없어요</td></tr>';
+      return;
+    }
+    document.getElementById('tbody').innerHTML = rows.map(buildRow).join('');
+  }
+
+  function buildRow(r) {
+    const fmtDate = d => d ? new Date(d).toLocaleDateString('ko-KR', { year:'2-digit', month:'numeric', day:'numeric' }) : '미지급';
+    const main = `
+      <tr id="crow-${r.kakao_id}" onclick="toggleDetail('${r.kakao_id}')">
+        <td><strong>${esc(r.nickname||'이름 없음')}</strong><br><span style="font-size:11px;color:var(--brown)">${esc(r.kakao_id)}</span></td>
+        <td><span class="badge-charged">${fmt(r.charged_balance)}원</span></td>
+        <td><span class="badge-earned">${fmt(r.earned_balance)}원</span></td>
+        <td><span class="badge-interest">${fmt(r.accrued_interest||0)}원</span></td>
+        <td><span class="total-val">${fmt(r.total_balance)}원</span></td>
+        <td style="font-size:12px;color:var(--brown)">${fmtDate(r.last_interest_applied)}</td>
+      </tr>`;
+    const detail = `
+      <tr class="detail-row" id="cdetail-${r.kakao_id}">
+        <td colspan="6">${buildDetail(r)}</td>
+      </tr>`;
+    return main + detail;
+  }
+
+  function buildDetail(r) {
+    const rid = r.kakao_id;
+    return `
+      <div class="action-grid">
+        <!-- 선불 충전 -->
+        <div class="action-box">
+          <h4>💙 선불 충전</h4>
+          <input type="number" id="chargeAmt-${rid}" placeholder="충전 금액 (원)" min="1000" step="1000">
+          <input type="text"   id="chargeDesc-${rid}" placeholder="메모 (예: 2박 선불)">
+          <button class="btn-action btn-charge" onclick="doCharge('${rid}','${esc(r.nickname||'')}')">충전하기</button>
+        </div>
+        <!-- 마일리지 적립 -->
+        <div class="action-box">
+          <h4>💚 마일리지 적립</h4>
+          <input type="number" id="earnAmt-${rid}"  placeholder="이용금액 (원)">
+          <input type="number" id="earnRate-${rid}" placeholder="적립률 (%)" value="3" min="1" max="20">
+          <input type="text"   id="earnDesc-${rid}" placeholder="메모 (예: 2박 이용)">
+          <button class="btn-action btn-earn" onclick="doEarn('${rid}','${esc(r.nickname||'')}')">적립하기</button>
+        </div>
+        <!-- 이자 지급 -->
+        <div class="action-box">
+          <h4>🌟 이자 지급 (연 5%)</h4>
+          <p style="font-size:12px;color:var(--brown);line-height:1.7;margin-bottom:10px">
+            충전 잔액: <strong>${fmt(r.charged_balance)}원</strong><br>
+            미지급 이자: <strong style="color:var(--gold)">${fmt(r.accrued_interest||0)}원</strong>
+          </p>
+          <button class="btn-action btn-interest" onclick="doInterest('${rid}')">이자 지급하기</button>
+        </div>
+        <!-- 크레딧 사용 차감 -->
+        <div class="action-box">
+          <h4>🔴 크레딧 사용 차감</h4>
+          <input type="number" id="useAmt-${rid}"  placeholder="차감 금액 (원)">
+          <input type="text"   id="useDesc-${rid}" placeholder="메모 (예: 1박 결제)">
+          <button class="btn-action btn-use" onclick="doUse('${rid}')">차감하기</button>
+        </div>
+      </div>
+      <div class="txn-list" id="txnList-${rid}">
+        <div class="txn-title">📋 거래 내역</div>
+        <div style="color:var(--brown);font-size:13px;text-align:center;padding:12px">불러오는 중...</div>
+      </div>`;
+  }
+
+  // ── 상세 펼치기 ──────────────────────────────────────────
+  async function toggleDetail(kid) {
+    const row   = document.getElementById('cdetail-' + kid);
+    const main  = document.getElementById('crow-' + kid);
+    const isOpen = row.classList.contains('open');
+    document.querySelectorAll('.detail-row.open').forEach(r => r.classList.remove('open'));
+    document.querySelectorAll('tbody tr.expanded').forEach(r => r.classList.remove('expanded'));
+    if (isOpen) return;
+    row.classList.add('open');
+    main.classList.add('expanded');
+    loadTxns(kid);
+  }
+
+  async function loadTxns(kid) {
+    const el = document.getElementById('txnList-' + kid);
+    if (!el) return;
+    const { data, error } = await db.rpc('admin_get_credit_transactions', { p_password: adminPw, p_kakao_id: kid });
+    if (error || !data?.length) {
+      el.innerHTML = '<div class="txn-title">📋 거래 내역</div><div style="color:var(--brown);font-size:13px;text-align:center;padding:12px">거래 내역이 없어요</div>';
+      return;
+    }
+    const TYPE = { charge:'💙 충전', interest:'🌟 이자', earn:'💚 마일리지', use:'🔴 사용', adjust:'⚙ 조정' };
+    el.innerHTML = '<div class="txn-title">📋 거래 내역 (' + data.length + '건)</div>' +
+      data.map(t => `
+        <div class="txn-item">
+          <div>
+            <div>${TYPE[t.type]||t.type} &nbsp;${esc(t.description||'')}</div>
+            <div class="txn-date">${new Date(t.created_at).toLocaleString('ko-KR')}</div>
+          </div>
+          <div>
+            <div class="txn-amt ${t.amount>0?'plus':'minus'}">${t.amount>0?'+':''}${fmt(t.amount)}원</div>
+            <div style="font-size:10px;color:#aaa;text-align:right">잔액 ${fmt(t.balance_after)}원</div>
+          </div>
+        </div>`).join('');
+  }
+
+  // ── 액션 ─────────────────────────────────────────────────
+  async function doCharge(kid, nickname) {
+    const amt  = parseInt(document.getElementById('chargeAmt-' + kid)?.value) || 0;
+    const desc = document.getElementById('chargeDesc-' + kid)?.value || '선불 충전';
+    if (amt <= 0) { showToast('⚠ 충전 금액을 입력해주세요'); return; }
+    const { data, error } = await db.rpc('admin_charge_credits', {
+      p_password: adminPw, p_kakao_id: kid, p_nickname: nickname, p_amount: amt, p_description: desc
+    });
+    if (error) { showToast('⚠ 오류: ' + error.message); return; }
+    showToast(`✓ ${fmt(amt)}원 충전 완료! 잔액 ${fmt(data.new_balance)}원`);
+    await reload();
+  }
+
+  async function doEarn(kid, nickname) {
+    const usage = parseInt(document.getElementById('earnAmt-' + kid)?.value) || 0;
+    const rate  = parseFloat(document.getElementById('earnRate-' + kid)?.value) || 3;
+    const desc  = document.getElementById('earnDesc-' + kid)?.value || '마일리지 적립';
+    if (usage <= 0) { showToast('⚠ 이용금액을 입력해주세요'); return; }
+    const amt = Math.floor(usage * rate / 100);
+    const { data, error } = await db.rpc('admin_earn_mileage', {
+      p_password: adminPw, p_kakao_id: kid, p_nickname: nickname,
+      p_amount: amt, p_reservation_id: null, p_description: `${desc} (${fmt(usage)}원 × ${rate}%)`
+    });
+    if (error) { showToast('⚠ 오류: ' + error.message); return; }
+    showToast(`⭐ ${fmt(amt)}원 마일리지 적립 완료!`);
+    await reload();
+  }
+
+  async function doInterest(kid) {
+    const { data, error } = await db.rpc('admin_apply_interest', { p_password: adminPw, p_kakao_id: kid });
+    if (error) { showToast('⚠ 오류: ' + error.message); return; }
+    if (!data.success) { showToast('⚠ ' + (data.error||'이자 지급 불가')); return; }
+    showToast(`🌟 이자 ${fmt(data.interest)}원 지급 완료!`);
+    await reload();
+  }
+
+  async function doUse(kid) {
+    const amt  = parseInt(document.getElementById('useAmt-' + kid)?.value) || 0;
+    const desc = document.getElementById('useDesc-' + kid)?.value || '크레딧 사용';
+    if (amt <= 0) { showToast('⚠ 차감 금액을 입력해주세요'); return; }
+    const { data, error } = await db.rpc('admin_use_credits', {
+      p_password: adminPw, p_kakao_id: kid, p_amount: amt, p_description: desc
+    });
+    if (error) { showToast('⚠ 오류: ' + error.message); return; }
+    if (!data.success) { showToast('⚠ ' + (data.error||'차감 실패')); return; }
+    showToast(`✓ ${fmt(amt)}원 차감 완료! 잔액 ${fmt(data.new_balance)}원`);
+    await reload();
+  }
+
+  // ── 신규 고객 모달 ────────────────────────────────────────
+  function openNewModal()  { document.getElementById('newModal').classList.add('open'); }
+  function closeNewModal() { document.getElementById('newModal').classList.remove('open'); }
+
+  async function submitNew() {
+    const kid  = document.getElementById('newKakaoId').value.trim();
+    const nick = document.getElementById('newNickname').value.trim();
+    const amt  = parseInt(document.getElementById('newAmount').value) || 0;
+    const desc = document.getElementById('newDesc').value.trim() || '초기 충전';
+    if (!kid || !nick) { showToast('⚠ 카카오 ID와 이름을 입력해주세요'); return; }
+    if (amt > 0) {
+      const { error } = await db.rpc('admin_charge_credits', {
+        p_password: adminPw, p_kakao_id: kid, p_nickname: nick, p_amount: amt, p_description: desc
+      });
+      if (error) { showToast('⚠ 오류: ' + error.message); return; }
+    }
+    closeNewModal();
+    showToast('✓ 신규 고객이 등록됐어요!');
+    await reload();
+  }
+
+  async function reload() {
+    const { data } = await db.rpc('admin_get_all_credits', { p_password: adminPw });
+    allData = data || [];
+    renderSummary();
+    renderTable();
+  }
+
+  // ── UTILS ─────────────────────────────────────────────────
+  function fmt(n) { return Number(n||0).toLocaleString('ko-KR'); }
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function showToast(msg) {
+    const el = document.createElement('div'); el.className='toast'; el.textContent=msg;
+    document.body.appendChild(el); setTimeout(()=>el.remove(), 3000);
+  }
+</script>
+</body>
+</html>
