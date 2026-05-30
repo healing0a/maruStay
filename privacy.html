@@ -1,316 +1,359 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>개인정보 처리방침 — MaruStay</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>개인정보처리방침 — MaruStay</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --brown-dk: #4a3728;
-      --accent:   #d4956a;
-      --text:     #3a2e27;
-      --text-mid: #6b5c50;
-      --text-lt:  #a89282;
-      --cream:    #fdf8f3;
-      --sand:     #f0e8db;
-      --white:    #ffffff;
+      --brown-dk: #3d1e08;
+      --brown:    #7a4520;
+      --accent:   #c87c3a;
+      --cream:    #fff8ec;
+      --sand:     #f5e8d2;
+      --text:     #3a2010;
     }
-    body { font-family: 'Noto Sans KR', sans-serif; background: var(--cream); color: var(--text); line-height: 1.8; font-size: 15px; }
-    .header { background: var(--brown-dk); padding: 20px 0; }
-    .header__inner { max-width: 860px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
-    .header__logo { color: #fff; font-size: 18px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 7px; }
-    .header__back { color: rgba(255,255,255,.65); font-size: 14px; text-decoration: none; }
-    .header__back:hover { color: var(--accent); }
-    .container { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
-    .page-title { font-size: 28px; font-weight: 700; color: var(--brown-dk); margin-bottom: 8px; }
-    .page-date { font-size: 13px; color: var(--text-lt); margin-bottom: 40px; }
-    .toc { background: var(--sand); border-radius: 12px; padding: 24px; margin-bottom: 48px; }
-    .toc h3 { font-size: 14px; font-weight: 700; color: var(--brown-dk); margin-bottom: 14px; }
-    .toc ol { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
-    .toc a { font-size: 14px; color: var(--accent); text-decoration: none; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background: #fff8f2;
+      color: var(--text);
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(145deg, var(--brown-dk) 0%, #7a4520 100%);
+      padding: 24px 20px 28px;
+      text-align: center;
+      color: #fff;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      color: rgba(255,255,255,.65); font-size: 13px;
+      text-decoration: none; margin-bottom: 10px;
+      background: none; border: none; cursor: pointer;
+      font-family: 'Pretendard', sans-serif;
+    }
+    .back-btn:hover { color: #fff; }
+    .header-title { font-size: 20px; font-weight: 800; }
+    .header-sub   { font-size: 12px; opacity: .6; margin-top: 4px; }
+
+    /* CONTENT */
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    .update-date {
+      font-size: 13px; color: var(--brown);
+      margin-bottom: 28px; text-align: right;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--cream);
+      border: 1.5px solid var(--sand);
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 36px;
+    }
+    .toc h3 { font-size: 14px; font-weight: 800; color: var(--brown); margin-bottom: 12px; }
+    .toc ol  { padding-left: 20px; }
+    .toc li  { font-size: 13px; margin-bottom: 6px; }
+    .toc a   { color: var(--accent); text-decoration: none; }
     .toc a:hover { text-decoration: underline; }
-    .section { margin-bottom: 48px; }
-    .section__title { font-size: 18px; font-weight: 700; color: var(--brown-dk); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--sand); display: flex; align-items: center; gap: 8px; }
-    .section__title span { font-size: 13px; font-weight: 600; background: var(--accent); color: #fff; padding: 2px 10px; border-radius: 50px; }
-    p { color: var(--text-mid); margin-bottom: 12px; }
-    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
-    th { background: var(--brown-dk); color: #fff; padding: 12px 16px; text-align: left; font-weight: 600; }
-    td { padding: 11px 16px; border-bottom: 1px solid var(--sand); color: var(--text-mid); vertical-align: top; }
-    tr:nth-child(even) td { background: var(--cream); }
-    .highlight { background: #fff8f0; border-left: 3px solid var(--accent); padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 16px 0; }
-    .highlight strong { color: var(--brown-dk); display: block; margin-bottom: 6px; }
-    ul, ol { padding-left: 20px; color: var(--text-mid); margin-bottom: 12px; }
-    li { margin-bottom: 6px; line-height: 1.7; }
-    .tag-required { display: inline-block; background: #ffe0e0; color: #c0392b; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 6px; }
-    .tag-optional { display: inline-block; background: #e8f4e8; color: #27ae60; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 6px; }
-    .contact-box { background: var(--white); border: 1.5px solid var(--sand); border-radius: 12px; padding: 24px; margin-top: 16px; }
-    .contact-box p { margin-bottom: 6px; }
-    .footer { background: var(--brown-dk); color: rgba(255,255,255,.5); text-align: center; padding: 24px; font-size: 13px; }
+
+    /* SECTIONS */
+    .section {
+      margin-bottom: 40px;
+      padding-top: 8px;
+    }
+    .section h2 {
+      font-size: 16px; font-weight: 800;
+      color: var(--brown-dk);
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--sand);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section h3 {
+      font-size: 14px; font-weight: 700;
+      color: var(--brown); margin: 16px 0 8px;
+    }
+    .section p {
+      font-size: 14px; color: var(--text);
+      margin-bottom: 10px;
+    }
+    .section ul, .section ol {
+      padding-left: 20px; margin-bottom: 10px;
+    }
+    .section li {
+      font-size: 14px; margin-bottom: 6px;
+    }
+
+    /* TABLE */
+    .info-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px; margin: 12px 0;
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 8px rgba(140,80,20,.08);
+    }
+    .info-table th {
+      background: var(--brown-dk); color: #fff;
+      padding: 10px 14px; text-align: left;
+      font-weight: 600; white-space: nowrap;
+    }
+    .info-table td {
+      padding: 10px 14px; border-bottom: 1px solid var(--sand);
+      vertical-align: top; line-height: 1.7;
+    }
+    .info-table tr:last-child td { border-bottom: none; }
+    .info-table tr:nth-child(even) td { background: var(--cream); }
+
+    /* HIGHLIGHT BOX */
+    .highlight {
+      background: var(--cream);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 28px 20px;
+      background: var(--brown-dk);
+      color: rgba(255,255,255,.6);
+      font-size: 12px;
+    }
+    .footer a { color: rgba(255,255,255,.8); text-decoration: none; }
   </style>
 </head>
 <body>
 
-  <header class="header">
-    <div class="header__inner">
-      <a href="index.html" class="header__logo">🐾 MaruStay</a>
-      <a href="index.html" class="header__back">← 홈으로</a>
-    </div>
-  </header>
+<div class="header">
+  <div><a href="/" class="back-btn">← 홈으로</a></div>
+  <div class="header-title">개인정보처리방침</div>
+  <div class="header-sub">MaruStay 반려동물 호텔</div>
+</div>
 
-  <div class="container">
+<div class="container">
 
-    <h1 class="page-title">개인정보 처리방침</h1>
-    <p class="page-date">시행일: 2025년 1월 1일 &nbsp;|&nbsp; 최종 수정일: 2025년 6월 1일</p>
+  <div class="update-date">최종 업데이트: 2026년 5월 28일</div>
 
-    <div class="toc">
-      <h3>목차</h3>
-      <ol>
-        <li><a href="#s1">수집하는 개인정보 항목</a></li>
-        <li><a href="#s2">개인정보 수집 및 이용 목적</a></li>
-        <li><a href="#s3">반려동물 활동 데이터 수집 및 활용</a></li>
-        <li><a href="#s4">CCTV 운영 관리 방침</a></li>
-        <li><a href="#s5">개인정보 보유 및 이용 기간</a></li>
-        <li><a href="#s6">개인정보의 제3자 제공</a></li>
-        <li><a href="#s7">개인정보 처리 위탁</a></li>
-        <li><a href="#s8">정보주체의 권리·의무 및 행사 방법</a></li>
-        <li><a href="#s9">개인정보의 파기</a></li>
-        <li><a href="#s10">개인정보 보호를 위한 기술적·관리적 조치</a></li>
-        <li><a href="#s11">개인정보 보호 책임자</a></li>
-        <li><a href="#s12">고지 의무</a></li>
-      </ol>
-    </div>
-
-    <p>MaruStay(이하 "회사")는 개인정보보호법, 정보통신망 이용촉진 및 정보보호 등에 관한 법률 등 관련 법령에 따라 이용자의 개인정보를 보호하고, 관련 고충을 신속하고 원활하게 처리할 수 있도록 아래와 같이 개인정보 처리방침을 수립·공개합니다.</p>
-
-    <!-- 1 -->
-    <div class="section" id="s1">
-      <h2 class="section__title"><span>01</span> 수집하는 개인정보 항목</h2>
-
-      <p><strong>보호자 정보</strong></p>
-      <table>
-        <thead><tr><th>구분</th><th>수집 항목</th><th>수집 방법</th></tr></thead>
-        <tbody>
-          <tr><td>필수</td><td>이름, 휴대폰 번호</td><td>회원가입·예약 시 직접 입력</td></tr>
-          <tr><td>필수</td><td>이메일 주소</td><td>회원가입 시 직접 입력</td></tr>
-          <tr><td>선택</td><td>주소 또는 숙소명, 비상 연락처</td><td>예약 시 직접 입력</td></tr>
-          <tr><td>자동 수집</td><td>서비스 이용 기록, 접속 IP, 쿠키</td><td>서비스 이용 중 자동 수집</td></tr>
-        </tbody>
-      </table>
-
-      <p><strong>반려동물 정보</strong></p>
-      <table>
-        <thead><tr><th>구분</th><th>수집 항목</th><th>수집 방법</th></tr></thead>
-        <tbody>
-          <tr><td>필수</td><td>이름, 종류(강아지/고양이), 견종·묘종, 나이, 성별, 몸무게</td><td>반려동물 등록 시 직접 입력</td></tr>
-          <tr><td>필수</td><td>예방접종 여부, 입질·공격성 여부, 분리불안 여부</td><td>반려동물 등록 시 직접 입력</td></tr>
-          <tr><td>선택</td><td>동물등록번호, 중성화 여부, 알러지, 복용 약, 특이사항</td><td>반려동물 등록 시 직접 입력</td></tr>
-          <tr><td>서비스 중 생성</td><td>식사·배변·수면·활동 기록, 체중 변화, 행동 특성 메모</td><td>운영자 기록 및 IoT 센서 수집</td></tr>
-        </tbody>
-      </table>
-
-      <p><strong>결제 정보</strong></p>
-      <p>결제 정보는 PG사(토스페이먼츠)를 통해 처리되며, 회사는 카드 번호 등 민감 결제 정보를 직접 저장하지 않습니다. 결제 승인 내역, MaruCredit 충전·사용 내역만 보관합니다.</p>
-    </div>
-
-    <!-- 2 -->
-    <div class="section" id="s2">
-      <h2 class="section__title"><span>02</span> 개인정보 수집 및 이용 목적</h2>
-      <table>
-        <thead><tr><th>이용 목적</th><th>수집 항목</th></tr></thead>
-        <tbody>
-          <tr><td>회원 가입·관리 및 본인 확인</td><td>이름, 휴대폰 번호, 이메일</td></tr>
-          <tr><td>호텔링 예약 및 서비스 제공</td><td>보호자 정보, 반려동물 정보, 이용 일정</td></tr>
-          <tr><td>반려동물 케어 및 안전 관리</td><td>건강 정보, 알러지, 복용 약, 특이사항</td></tr>
-          <tr><td>AI 알림장 리포트 생성 및 발송</td><td>반려동물 활동 데이터, 환경 센서 데이터</td></tr>
-          <tr><td>CCTV 링크 제공</td><td>입실 정보, 객실 정보</td></tr>
-          <tr><td>결제·환불·MaruCredit 처리</td><td>결제 정보, 크레딧 내역</td></tr>
-          <tr><td>하이오더 서비스 처리</td><td>주문 내역, 요청 사항</td></tr>
-          <tr><td>고객 문의 응대</td><td>이름, 연락처, 문의 내용</td></tr>
-          <tr><td>서비스 개선 및 통계 분석</td><td>이용 기록, 반려동물 활동 데이터(익명화)</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 3 -->
-    <div class="section" id="s3">
-      <h2 class="section__title"><span>03</span> 반려동물 활동 데이터 수집 및 활용</h2>
-
-      <div class="highlight">
-        <strong>촬영된 영상과 활동 데이터는 아이의 상태를 더 잘 이해하고, 재방문 시 더 나은 케어를 제공하기 위한 목적으로만 활용됩니다.</strong>
-        외부 광고·홍보·제3자 제공 목적으로는 절대 사용되지 않습니다.
-      </div>
-
-      <p><strong>수집하는 반려동물 활동 데이터</strong></p>
-      <ul>
-        <li>식사 섭취 여부 및 양</li>
-        <li>배변 횟수 및 상태</li>
-        <li>수면 시간 및 패턴</li>
-        <li>활동량 및 움직임 패턴</li>
-        <li>특이 행동 (불안, 짖음, 탐색 등)</li>
-        <li>객실 내 온도·습도·소음 등 환경 데이터</li>
-        <li>CCTV 영상 (보호자 동의 시)</li>
-      </ul>
-
-      <p><strong>활용 목적 및 범위</strong></p>
-      <table>
-        <thead><tr><th>활용 목적</th><th>필수/선택</th><th>설명</th></tr></thead>
-        <tbody>
-          <tr>
-            <td>당일 케어 및 알림장 리포트</td>
-            <td><span class="tag-required">필수</span></td>
-            <td>보호자에게 반려동물의 하루를 전달하기 위한 리포트 작성에 사용</td>
-          </tr>
-          <tr>
-            <td>재방문 시 맞춤 케어</td>
-            <td><span class="tag-required">필수</span></td>
-            <td>과거 이용 이력을 기반으로 개별 성향에 맞는 케어 제공</td>
-          </tr>
-          <tr>
-            <td>AI 케어 품질 개선 학습</td>
-            <td><span class="tag-optional">선택 동의</span></td>
-            <td>반려동물의 안전과 편안함을 위한 AI 모델 학습 자료로 활용. 개인 식별이 불가한 형태로 익명화하여 사용. 동의 철회 시 즉시 학습에서 제외</td>
-          </tr>
-          <tr>
-            <td>서비스 통계 및 환경 개선</td>
-            <td><span class="tag-optional">선택 동의</span></td>
-            <td>객실 환경·케어 품질 향상을 위한 익명화 통계 분석. 개별 반려동물 식별 불가 형태로만 사용</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="highlight">
-        <strong>AI 학습 데이터 활용 원칙</strong>
-        <ul style="margin-top:8px;">
-          <li>반드시 보호자의 별도 동의를 받은 경우에만 AI 학습에 활용합니다.</li>
-          <li>학습에 사용되는 데이터는 개인 식별이 불가하도록 익명화 처리합니다.</li>
-          <li>학습 목적은 반려동물의 안전·편안함·건강 개선에만 한정합니다.</li>
-          <li>상업적 광고·홍보·외부 판매에 절대 사용하지 않습니다.</li>
-          <li>동의를 철회하면 해당 데이터는 즉시 학습 대상에서 제외됩니다.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 4 -->
-    <div class="section" id="s4">
-      <h2 class="section__title"><span>04</span> CCTV 운영 관리 방침</h2>
-      <ul>
-        <li>CCTV는 반려동물 안전 모니터링 및 응급 상황 대응을 목적으로 운영합니다.</li>
-        <li>보호자는 반려동물이 입실한 기간 동안에만 해당 객실 CCTV 링크에 접근 가능합니다.</li>
-        <li>CCTV 링크는 퇴실 후 자동 만료됩니다.</li>
-        <li>타 보호자의 반려동물이 촬영된 영상은 절대 제공하지 않습니다.</li>
-        <li>CCTV 영상의 외부 공유, 화면 녹화는 개인정보보호법 위반이 될 수 있으며 이를 금지합니다.</li>
-        <li>영상은 30일간 보관 후 자동 삭제됩니다. (단, 사고·분쟁 발생 시 관계 법령에 따라 연장 보관)</li>
-      </ul>
-    </div>
-
-    <!-- 5 -->
-    <div class="section" id="s5">
-      <h2 class="section__title"><span>05</span> 개인정보 보유 및 이용 기간</h2>
-      <table>
-        <thead><tr><th>항목</th><th>보유 기간</th><th>근거</th></tr></thead>
-        <tbody>
-          <tr><td>회원 정보</td><td>회원 탈퇴 시까지</td><td>이용자 동의</td></tr>
-          <tr><td>예약·이용 기록</td><td>3년</td><td>전자상거래법</td></tr>
-          <tr><td>결제·환불 기록</td><td>5년</td><td>전자상거래법</td></tr>
-          <tr><td>반려동물 케어 기록</td><td>마지막 이용일로부터 3년</td><td>이용자 동의</td></tr>
-          <tr><td>CCTV 영상</td><td>30일 (사고 발생 시 연장)</td><td>개인정보보호법</td></tr>
-          <tr><td>문의 기록</td><td>3년</td><td>이용자 동의</td></tr>
-          <tr><td>AI 학습 동의 데이터</td><td>동의 철회 시 즉시 삭제</td><td>이용자 동의</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 6 -->
-    <div class="section" id="s6">
-      <h2 class="section__title"><span>06</span> 개인정보의 제3자 제공</h2>
-      <p>회사는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다. 다만, 아래의 경우는 예외로 합니다.</p>
-      <ul>
-        <li>이용자가 사전에 동의한 경우</li>
-        <li>법령의 규정에 의거하거나 수사기관의 요청이 있는 경우</li>
-        <li>반려동물 응급 상황으로 동물병원 이송이 필요한 경우 (보호자에게 즉시 고지)</li>
-      </ul>
-    </div>
-
-    <!-- 7 -->
-    <div class="section" id="s7">
-      <h2 class="section__title"><span>07</span> 개인정보 처리 위탁</h2>
-      <table>
-        <thead><tr><th>수탁 업체</th><th>위탁 업무</th><th>보유 기간</th></tr></thead>
-        <tbody>
-          <tr><td>토스페이먼츠(주)</td><td>결제 처리, 환불</td><td>계약 종료 시까지</td></tr>
-          <tr><td>솔라피(주)</td><td>카카오 알림톡, SMS 발송</td><td>계약 종료 시까지</td></tr>
-          <tr><td>Supabase Inc.</td><td>데이터베이스 운영·저장</td><td>계약 종료 시까지</td></tr>
-          <tr><td>Anthropic PBC</td><td>AI 리포트 문장 생성 (익명화 데이터)</td><td>API 호출 완료 즉시 삭제</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 8 -->
-    <div class="section" id="s8">
-      <h2 class="section__title"><span>08</span> 정보주체의 권리·의무 및 행사 방법</h2>
-      <p>이용자는 언제든지 아래 권리를 행사할 수 있습니다.</p>
-      <ul>
-        <li>개인정보 열람 요청</li>
-        <li>개인정보 정정·삭제 요청</li>
-        <li>개인정보 처리 정지 요청</li>
-        <li>AI 학습 동의 철회</li>
-        <li>회원 탈퇴 및 전체 데이터 삭제 요청</li>
-      </ul>
-      <p>요청은 카카오톡 채널(@마루스테이) 또는 이메일로 접수하며, <strong>14일 이내</strong>에 처리 결과를 안내드립니다.</p>
-    </div>
-
-    <!-- 9 -->
-    <div class="section" id="s9">
-      <h2 class="section__title"><span>09</span> 개인정보의 파기</h2>
-      <p>보유 기간이 경과하거나 처리 목적이 달성된 개인정보는 지체 없이 파기합니다.</p>
-      <ul>
-        <li><strong>전자적 파일:</strong> 복구 불가능한 방법으로 영구 삭제</li>
-        <li><strong>출력물·서면:</strong> 분쇄 또는 소각</li>
-        <li><strong>CCTV 영상:</strong> 시스템 자동 삭제 (30일 경과 시)</li>
-      </ul>
-    </div>
-
-    <!-- 10 -->
-    <div class="section" id="s10">
-      <h2 class="section__title"><span>10</span> 개인정보 보호를 위한 기술적·관리적 조치</h2>
-      <ul>
-        <li>모든 데이터 전송 구간 SSL/TLS 암호화 적용</li>
-        <li>개인정보 접근 권한 최소화 (담당자 외 접근 불가)</li>
-        <li>데이터베이스 행 수준 보안(RLS) 적용 — 본인 데이터만 접근 가능</li>
-        <li>관리자 계정 2단계 인증 적용</li>
-        <li>CCTV 링크 만료 시간 자동 처리</li>
-        <li>결제 정보 직접 저장 금지 (PG사 위임 처리)</li>
-        <li>정기적 보안 점검 및 접근 로그 기록</li>
-      </ul>
-    </div>
-
-    <!-- 11 -->
-    <div class="section" id="s11">
-      <h2 class="section__title"><span>11</span> 개인정보 보호 책임자</h2>
-      <div class="contact-box">
-        <p><strong>개인정보 보호 책임자</strong></p>
-        <p>성명: 대표자 성명 입력</p>
-        <p>직책: 대표</p>
-        <p>연락처: 000-0000-0000</p>
-        <p>이메일: privacy@maruStay.kr</p>
-        <p style="margin-top:12px; font-size:13px; color:#a89282;">개인정보 침해 신고·상담은 개인정보보호위원회(privacy.go.kr, 국번없이 182) 또는 한국인터넷진흥원(privacy.kisa.or.kr, 국번없이 118)에도 문의하실 수 있습니다.</p>
-      </div>
-    </div>
-
-    <!-- 12 -->
-    <div class="section" id="s12">
-      <h2 class="section__title"><span>12</span> 고지 의무</h2>
-      <p>본 개인정보 처리방침은 법령·정책 변경에 따라 수정될 수 있습니다. 변경 시 홈페이지 공지사항을 통해 사전 안내합니다.</p>
-    </div>
-
+  <!-- 목차 -->
+  <div class="toc">
+    <h3>📋 목차</h3>
+    <ol>
+      <li><a href="#s1">개인정보의 수집 및 이용 목적</a></li>
+      <li><a href="#s2">수집하는 개인정보의 항목</a></li>
+      <li><a href="#s3">개인정보의 보유 및 이용 기간</a></li>
+      <li><a href="#s4">개인정보의 제3자 제공</a></li>
+      <li><a href="#s5">개인정보처리의 위탁</a></li>
+      <li><a href="#s6">CCTV 운영 안내</a></li>
+      <li><a href="#s7">AI 알림장 서비스 안내</a></li>
+      <li><a href="#s8">정보주체의 권리와 행사 방법</a></li>
+      <li><a href="#s9">개인정보의 안전성 확보 조치</a></li>
+      <li><a href="#s10">개인정보 보호책임자</a></li>
+      <li><a href="#s11">개인정보처리방침의 변경</a></li>
+    </ol>
   </div>
 
-  <footer class="footer">
-    <p>© 2025 MaruStay. All rights reserved.</p>
-  </footer>
+  <div class="highlight">
+    마루스테이(이하 "업체")는 고객님과 소중한 반려동물의 개인정보를 안전하게 보호하기 위해
+    「개인정보 보호법」을 준수하며, 본 개인정보처리방침을 통해 수집·이용·보관 방침을 안내합니다.
+  </div>
+
+  <!-- 1 -->
+  <div class="section" id="s1">
+    <h2>① 개인정보의 수집 및 이용 목적</h2>
+    <p>업체는 다음의 목적을 위해 개인정보를 수집·이용합니다.</p>
+    <ul>
+      <li>반려동물 호텔 예약 신청 접수 및 예약 확인</li>
+      <li>체크인·체크아웃 서비스 제공 및 관리</li>
+      <li>반려동물 건강 상태 파악 및 맞춤 케어 제공</li>
+      <li>예약 관련 안내 및 알림 발송 (이메일, 문자)</li>
+      <li>AI 알림장 서비스 제공 (반려동물 하루 일과 전달)</li>
+      <li>마루 크레딧 및 안심 보호자 인증 서비스 운영</li>
+      <li>민원 처리 및 고객 응대</li>
+      <li>서비스 개선을 위한 통계 분석 (마케팅 동의 시)</li>
+    </ul>
+  </div>
+
+  <!-- 2 -->
+  <div class="section" id="s2">
+    <h2>② 수집하는 개인정보의 항목</h2>
+
+    <h3>보호자 정보</h3>
+    <table class="info-table">
+      <tr><th>항목</th><th>수집 방법</th><th>필수 여부</th></tr>
+      <tr><td>이름</td><td>예약 폼 입력 / 카카오 로그인</td><td>필수</td></tr>
+      <tr><td>연락처 (휴대폰 번호)</td><td>예약 폼 입력</td><td>필수</td></tr>
+      <tr><td>이메일 주소</td><td>예약 폼 입력 / 카카오 로그인</td><td>선택</td></tr>
+      <tr><td>주소</td><td>예약 폼 입력</td><td>선택</td></tr>
+      <tr><td>비상연락처</td><td>예약 폼 입력</td><td>필수</td></tr>
+      <tr><td>카카오 계정 ID · 프로필 이미지</td><td>카카오 소셜 로그인</td><td>선택 (로그인 시)</td></tr>
+    </table>
+
+    <h3>반려동물 정보</h3>
+    <table class="info-table">
+      <tr><th>항목</th><th>수집 목적</th></tr>
+      <tr><td>이름, 종류, 품종, 나이, 성별</td><td>기본 케어 서비스 제공</td></tr>
+      <tr><td>체중, 중성화 여부</td><td>객실 배정 및 케어 계획</td></tr>
+      <tr><td>동물등록번호</td><td>신원 확인 및 안심 보호자 인증</td></tr>
+      <tr><td>예방접종 여부</td><td>전염병 예방 및 안전한 환경 유지</td></tr>
+      <tr><td>물림사고 이력, 분리불안 여부</td><td>안전사고 예방</td></tr>
+      <tr><td>알레르기, 복용 약물, 특이사항</td><td>맞춤 케어 및 응급상황 대비</td></tr>
+    </table>
+  </div>
+
+  <!-- 3 -->
+  <div class="section" id="s3">
+    <h2>③ 개인정보의 보유 및 이용 기간</h2>
+    <table class="info-table">
+      <tr><th>정보 종류</th><th>보유 기간</th></tr>
+      <tr><td>예약 및 이용 정보</td><td>서비스 이용 종료 후 3년</td></tr>
+      <tr><td>카카오 로그인 정보</td><td>서비스 탈퇴 또는 동의 철회 시까지</td></tr>
+      <tr><td>마루 크레딧 거래 내역</td><td>크레딧 소멸 후 1년</td></tr>
+      <tr><td>AI 알림장 기록</td><td>퇴실 후 1년</td></tr>
+      <tr><td>마케팅 정보 (동의 시)</td><td>동의 철회 시까지</td></tr>
+    </table>
+    <div class="highlight">
+      단, 관계 법령에 따라 보존이 필요한 경우 해당 기간 동안 보관합니다.<br>
+      (소비자 보호에 관한 법률: 계약·청약철회 3년, 대금결제·재화공급 5년)
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="section" id="s4">
+    <h2>④ 개인정보의 제3자 제공</h2>
+    <p>
+      업체는 원칙적으로 고객의 개인정보를 외부에 제공하지 않습니다.<br>
+      다만, 다음의 경우에는 예외로 합니다.
+    </p>
+    <ul>
+      <li>고객이 사전에 동의한 경우</li>
+      <li>법령의 규정에 의하거나 수사 목적으로 관계기관의 요청이 있는 경우</li>
+      <li>서비스 제공을 위한 최소한의 정보가 필요한 협력업체 (픽업 서비스 등)</li>
+    </ul>
+  </div>
+
+  <!-- 5 -->
+  <div class="section" id="s5">
+    <h2>⑤ 개인정보처리의 위탁</h2>
+    <table class="info-table">
+      <tr><th>수탁업체</th><th>위탁 업무 내용</th></tr>
+      <tr><td>Supabase Inc.</td><td>고객 및 예약 데이터 저장·관리 (클라우드 데이터베이스)</td></tr>
+      <tr><td>Vercel Inc.</td><td>웹 서비스 호스팅 및 운영</td></tr>
+      <tr><td>카카오(주)</td><td>소셜 로그인 인증 서비스</td></tr>
+      <tr><td>Resend Inc.</td><td>이메일 발송 서비스</td></tr>
+    </table>
+    <p>위탁계약 시 개인정보가 안전하게 관리되도록 필요한 사항을 계약서에 명시합니다.</p>
+  </div>
+
+  <!-- 6 -->
+  <div class="section" id="s6">
+    <h2>⑥ CCTV 운영 안내</h2>
+    <ul>
+      <li><strong>설치 목적:</strong> 반려동물 안전 모니터링 및 시설 보안</li>
+      <li><strong>설치 장소:</strong> 각 객실 내부 (보호자 실시간 모니터링 제공)</li>
+      <li><strong>촬영 시간:</strong> 24시간 연속 촬영</li>
+      <li><strong>영상 보관 기간:</strong> 퇴실 후 7일 후 자동 삭제</li>
+      <li><strong>관리 책임자:</strong> 업체 대표자</li>
+    </ul>
+    <div class="highlight">
+      CCTV 영상은 반려동물 케어 목적 외에는 사용되지 않으며, 외부에 제공되지 않습니다.<br>
+      영상 열람을 원하시는 경우 직접 방문하여 신청하실 수 있습니다.
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="section" id="s7">
+    <h2>⑦ AI 알림장 서비스 안내</h2>
+    <p>
+      마루스테이는 반려동물의 하루 일과를 보호자에게 전달하기 위해 AI 알림장 서비스를 운영합니다.
+    </p>
+    <ul>
+      <li>담당 선생님이 반려동물의 컨디션, 식사량, 활동 내역을 입력합니다.</li>
+      <li>입력된 정보를 바탕으로 자동 문장이 생성되어 보호자에게 전달됩니다.</li>
+      <li>알림장 내용(반려동물 활동 기록)은 퇴실 후 1년간 보관됩니다.</li>
+      <li>알림장 서비스 이용을 원하지 않으시는 경우 예약 시 동의 철회가 가능합니다.</li>
+    </ul>
+  </div>
+
+  <!-- 8 -->
+  <div class="section" id="s8">
+    <h2>⑧ 정보주체의 권리와 행사 방법</h2>
+    <p>고객은 언제든지 다음과 같은 권리를 행사할 수 있습니다.</p>
+    <ul>
+      <li>개인정보 열람 요청</li>
+      <li>오류 등이 있을 경우 정정 요청</li>
+      <li>삭제 요청 (단, 법령에 따라 보존이 필요한 정보는 제외)</li>
+      <li>처리 정지 요청</li>
+      <li>마케팅 수신 동의 철회</li>
+    </ul>
+    <div class="highlight">
+      권리 행사는 이메일 또는 직접 방문을 통해 요청하실 수 있으며,<br>
+      요청 접수 후 <strong>10일 이내</strong>에 처리 결과를 안내해드립니다.
+    </div>
+  </div>
+
+  <!-- 9 -->
+  <div class="section" id="s9">
+    <h2>⑨ 개인정보의 안전성 확보 조치</h2>
+    <ul>
+      <li><strong>접근 제한:</strong> 개인정보처리시스템에 대한 접근 권한을 최소화</li>
+      <li><strong>암호화 전송:</strong> SSL/TLS 암호화 통신(HTTPS) 적용</li>
+      <li><strong>비밀번호 보호:</strong> 관리자 페이지 비밀번호 인증 및 서버사이드 검증</li>
+      <li><strong>접속 기록 보관:</strong> 개인정보처리시스템 접속 기록 보관 및 위변조 방지</li>
+      <li><strong>외부 위탁 관리:</strong> 수탁업체의 개인정보 보호 준수 여부 주기적 확인</li>
+    </ul>
+  </div>
+
+  <!-- 10 -->
+  <div class="section" id="s10">
+    <h2>⑩ 개인정보 보호책임자</h2>
+    <table class="info-table">
+      <tr><th>구분</th><th>내용</th></tr>
+      <tr><td>사업장명</td><td>마루스테이 (MaruStay)</td></tr>
+      <tr><td>소재지</td><td>경상남도 통영시</td></tr>
+      <tr><td>개인정보 보호책임자</td><td>대표자</td></tr>
+      <tr><td>문의 이메일</td><td>healing0a@naver.com</td></tr>
+      <tr><td>문의 채널</td><td>카카오톡 채널 또는 예약 문의</td></tr>
+    </table>
+    <p style="margin-top:12px; font-size:13px; color:var(--brown)">
+      개인정보 침해에 대한 신고나 상담이 필요하신 경우 아래 기관에 문의하실 수 있습니다.
+    </p>
+    <ul>
+      <li>개인정보 침해신고센터: privacy.kisa.or.kr / ☎ 118</li>
+      <li>개인정보 분쟁조정위원회: www.kopico.go.kr / ☎ 1833-6972</li>
+    </ul>
+  </div>
+
+  <!-- 11 -->
+  <div class="section" id="s11">
+    <h2>⑪ 개인정보처리방침의 변경</h2>
+    <p>
+      본 개인정보처리방침은 법령·정책 또는 서비스 변경에 따라 내용이 변경될 수 있습니다.<br>
+      변경 시 시행일로부터 최소 <strong>7일 전</strong>에 홈페이지를 통해 공지합니다.
+    </p>
+    <ul>
+      <li>현행 시행일: 2026년 5월 28일</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="footer">
+  © 2026 MaruStay · 반려동물 프리미엄 호텔 ·
+  <a href="/">홈으로 돌아가기</a>
+</div>
 
 </body>
 </html>
