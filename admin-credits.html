@@ -102,6 +102,21 @@
     .btn-earn    { background:var(--green); color:#fff; }
     .btn-interest{ background:var(--gold);  color:#fff; }
     .btn-use     { background:var(--red);   color:#fff; }
+    .btn-refund  { background:#4a1505;     color:#fff; }
+
+    /* 환불 내역 */
+    .refund-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:9px 0; border-bottom:1px solid var(--sand); font-size:13px;
+    }
+    .refund-row:last-child { border-bottom:none; }
+    .refund-total {
+      background:#fce4e4; border-radius:12px; padding:16px;
+      text-align:center; margin-top:12px;
+    }
+    .refund-total .lbl { font-size:13px; color:var(--red); margin-bottom:4px; }
+    .refund-total .amt { font-size:28px; font-weight:800; color:var(--red); }
+    .refund-total .sub { font-size:11px; color:#aaa; margin-top:4px; }
 
     /* TXN HISTORY */
     .txn-list { margin-top:14px; }
@@ -212,6 +227,19 @@
   </table>
 </div>
 
+<!-- 환불 계산 모달 -->
+<div class="modal-overlay" id="refundModal">
+  <div class="modal" style="max-width:460px">
+    <h3>💸 환불 계산 내역</h3>
+    <div id="refundBreakdown"></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn-modal-cancel" onclick="closeRefundModal()">취소</button>
+      <button class="btn-modal-ok" id="btnConfirmRefund"
+        style="background:#4a1505;flex:2">환불 처리 확정</button>
+    </div>
+  </div>
+</div>
+
 <!-- 신규 고객 모달 -->
 <div class="modal-overlay" id="newModal">
   <div class="modal">
@@ -320,6 +348,16 @@
           <input type="text"   id="useDesc-${rid}" placeholder="메모 (예: 1박 결제)">
           <button class="btn-action btn-use" onclick="doUse('${rid}')">차감하기</button>
         </div>
+        <!-- 환불 처리 -->
+        <div class="action-box" style="border-color:#ffccbc">
+          <h4>💸 환불 처리</h4>
+          <p style="font-size:12px;color:var(--brown);line-height:1.8;margin-bottom:10px">
+            충전 잔액: <strong>${fmt(r.charged_balance)}원</strong><br>
+            <span style="color:#aaa;font-size:11px">보너스 차감 후 실 환불액을 계산합니다</span>
+          </p>
+          <input type="text" id="refundNote-${rid}" placeholder="환불 사유 메모">
+          <button class="btn-action btn-refund" onclick="doRefundCalc('${rid}')">💸 환불 금액 계산</button>
+        </div>
       </div>
       <div class="txn-list" id="txnList-${rid}">
         <div class="txn-title">📋 거래 내역</div>
@@ -409,6 +447,88 @@
     if (error) { showToast('⚠ 오류: ' + error.message); return; }
     if (!data.success) { showToast('⚠ ' + (data.error||'차감 실패')); return; }
     showToast(`✓ ${fmt(amt)}원 차감 완료! 잔액 ${fmt(data.new_balance)}원`);
+    await reload();
+  }
+
+  // ── 환불 처리 ────────────────────────────────────────────
+  let refundTarget = null;
+
+  async function doRefundCalc(kid) {
+    const note = document.getElementById('refundNote-' + kid)?.value || '';
+    const btn  = document.querySelector(`button.btn-refund`);
+
+    const { data, error } = await db.rpc('admin_calculate_refund', {
+      p_password: adminPw, p_kakao_id: kid
+    });
+    if (error) { showToast('⚠ 오류: ' + error.message); return; }
+
+    refundTarget = { kid, note };
+
+    const d = data;
+    document.getElementById('refundBreakdown').innerHTML = `
+      <div style="background:var(--cream);border-radius:12px;padding:14px 16px;margin-bottom:4px">
+        <div class="refund-row">
+          <span>💙 총 충전액</span>
+          <strong>${fmt(d.total_deposited)}원</strong>
+        </div>
+        <div class="refund-row">
+          <span>🌟 지급된 이자/보너스</span>
+          <strong style="color:var(--gold)">+${fmt(d.total_interest)}원</strong>
+        </div>
+        <div class="refund-row">
+          <span>🔴 총 사용액</span>
+          <strong>-${fmt(d.total_used)}원</strong>
+        </div>
+        <div class="refund-row">
+          <span style="padding-left:10px;color:#aaa">↳ 충전분 사용액</span>
+          <span style="color:#aaa">${fmt(d.used_from_charged)}원</span>
+        </div>
+        <div class="refund-row">
+          <span>📊 보너스 지급률</span>
+          <strong>${d.bonus_rate_pct}%</strong>
+        </div>
+        <div class="refund-row" style="border-bottom:none">
+          <span>⚠️ 환불 시 보너스 차감</span>
+          <strong style="color:var(--red)">-${fmt(d.clawback)}원</strong>
+        </div>
+      </div>
+      <div class="refund-total">
+        <div class="lbl">실 환불 예정액</div>
+        <div class="amt">${fmt(d.refundable)}원</div>
+        <div class="sub">충전 잔액 ${fmt(d.charged_balance)}원 − 보너스 차감 ${fmt(d.clawback)}원</div>
+      </div>
+      <p style="font-size:12px;color:#aaa;margin-top:12px;line-height:1.7">
+        ⚠️ 환불 확정 시 충전 크레딧 잔액 전체가 차감 처리됩니다.<br>
+        마일리지(적립 포인트)는 별도 차감되지 않습니다.
+      </p>`;
+
+    document.getElementById('btnConfirmRefund').onclick = processRefund;
+    document.getElementById('refundModal').classList.add('open');
+  }
+
+  function closeRefundModal() {
+    document.getElementById('refundModal').classList.remove('open');
+    refundTarget = null;
+  }
+
+  async function processRefund() {
+    if (!refundTarget) return;
+    const btn = document.getElementById('btnConfirmRefund');
+    btn.textContent = '⏳ 처리 중...';
+    btn.disabled = true;
+
+    const { data, error } = await db.rpc('admin_process_refund', {
+      p_password:   adminPw,
+      p_kakao_id:   refundTarget.kid,
+      p_admin_note: refundTarget.note
+    });
+
+    btn.textContent = '환불 처리 확정';
+    btn.disabled = false;
+
+    if (error) { showToast('⚠ 오류: ' + error.message); return; }
+    closeRefundModal();
+    showToast(`✓ 환불 완료! 실 환불액: ${fmt(data.refundable)}원 (보너스 차감: ${fmt(data.clawback)}원)`);
     await reload();
   }
 
